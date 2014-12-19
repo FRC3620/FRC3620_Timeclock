@@ -1,0 +1,18 @@
+<ivy-module version="2.0">
+    <info organisation="org.frc3620" module="timeclock"/>
+
+    <configurations>
+        <conf name="compile" description="Required to compile application"/>
+        <conf name="runtime" description="Additional run-time dependencies" extends="compile"/>
+        <conf name="test"    description="Required for test only" extends="runtime"/>
+    </configurations>
+
+    <dependencies>
+        <!-- compile dependencies -->
+        <dependency org="org.slf4j" name="slf4j-api" rev="1.7.5" conf="compile->default"/>
+
+        <!-- runtime dependencies -->
+        <dependency org="org.slf4j" name="slf4j-log4j12" rev="1.7.5" conf="runtime->default"/>
+    </dependencies>
+
+</ivy-module>
