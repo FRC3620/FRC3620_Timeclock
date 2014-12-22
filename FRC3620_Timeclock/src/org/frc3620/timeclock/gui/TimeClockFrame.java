@@ -1,14 +1,13 @@
 package org.frc3620.timeclock.gui;
 
-import org.frc3620.timeclock.Where;
-import org.frc3620.timeclock.CurrentStatus;
-import java.util.Date;
 import javax.swing.JLabel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -16,25 +15,27 @@ import javax.swing.table.TableModel;
  */
 public class TimeClockFrame extends javax.swing.JFrame {
 
+    Logger logger = LoggerFactory.getLogger(getClass());
+
     /**
      * Creates new form TimeClockFrame
      */
     public TimeClockFrame(TableModel t) {
         tableModel = t;
         tableColumnModel = new DefaultTableColumnModel();
-        tableColumnModel.addColumn(new TableColumn(0, 200) );
-        tableColumnModel.addColumn(new TableColumn(1, 50) );
-        tableColumnModel.addColumn(new TableColumn(2, 50) );
+        tableColumnModel.addColumn(new TableColumn(0, 200));
+        tableColumnModel.addColumn(new TableColumn(1, 50));
+        tableColumnModel.addColumn(new TableColumn(2, 50));
         DefaultTableCellRenderer rRenderer = new DefaultTableCellRenderer();
         rRenderer.setHorizontalAlignment(JLabel.CENTER);
         tableColumnModel.getColumn(1).setCellRenderer(rRenderer);
         tableColumnModel.getColumn(2).setCellRenderer(new HHMMRenderer());
         initComponents();
     }
-    
+
     TableModel tableModel = null;
     TableColumnModel tableColumnModel = null;
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -53,7 +54,12 @@ public class TimeClockFrame extends javax.swing.JFrame {
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jTable1.setModel(tableModel);
         jTable1.setShowVerticalLines(false);
@@ -109,46 +115,15 @@ public class TimeClockFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(TimeClockFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(TimeClockFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(TimeClockFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(TimeClockFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        logger.info("window closing event fired");
+        windowClosing = true;
+    }//GEN-LAST:event_formWindowClosing
 
-        
-        final TimeClockStatusModel t = new TimeClockStatusModel();
-        t.addTimeClockStatus(new CurrentStatus(1, "Wegscheid, Douglas", Where.IN, new Date()));
-        t.addTimeClockStatus(new CurrentStatus(2, "Wegscheid, Tearesa", null, null ));
-        t.addTimeClockStatus(new CurrentStatus(3, "Miller, Mike", Where.OUT, new Date()));
-        
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new TimeClockFrame(t).setVisible(true);
-            }
-        });
+    private boolean windowClosing = false;
+
+    public boolean isWindowClosing() {
+        return windowClosing;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
