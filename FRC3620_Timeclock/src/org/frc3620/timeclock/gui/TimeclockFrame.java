@@ -40,8 +40,8 @@ public class TimeclockFrame extends javax.swing.JFrame implements ListSelectionL
         tableColumnModel.getColumn(2).setCellRenderer(new HHMMRenderer());
         initComponents();
 
-        jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        jTable1.getSelectionModel().addListSelectionListener(this);
+        personTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        personTable.getSelectionModel().addListSelectionListener(this);
         // setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
     }
 
@@ -58,8 +58,9 @@ public class TimeclockFrame extends javax.swing.JFrame implements ListSelectionL
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        personTable = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
+        currentTime = new javax.swing.JLabel();
         checkInButton = new javax.swing.JButton();
         checkOutButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -73,11 +74,13 @@ public class TimeclockFrame extends javax.swing.JFrame implements ListSelectionL
             }
         });
 
-        jTable1.setModel(tableModel);
-        jTable1.setShowVerticalLines(false);
-        jTable1.getTableHeader().setReorderingAllowed(false);
-        jScrollPane1.setViewportView(jTable1);
-        jTable1.setColumnModel(tableColumnModel);
+        personTable.setModel(tableModel);
+        jScrollPane1.setViewportView(personTable);
+
+        currentTime.setFont(new java.awt.Font("Courier New", 0, 24)); // NOI18N
+        currentTime.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        currentTime.setText(" ");
+        currentTime.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         checkInButton.setText("Check In");
         checkInButton.addActionListener(new java.awt.event.ActionListener() {
@@ -101,14 +104,18 @@ public class TimeclockFrame extends javax.swing.JFrame implements ListSelectionL
                 .addComponent(checkInButton, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(checkOutButton, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE))
+            .addComponent(currentTime, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(checkInButton)
-                    .addComponent(checkOutButton))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(currentTime)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(checkOutButton))
+                    .addComponent(checkInButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
 
         jMenu1.setText("File");
@@ -130,8 +137,10 @@ public class TimeclockFrame extends javax.swing.JFrame implements ListSelectionL
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 447, Short.MAX_VALUE)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jScrollPane1)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pack();
@@ -144,7 +153,7 @@ public class TimeclockFrame extends javax.swing.JFrame implements ListSelectionL
 
     private void checkInButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkInButtonActionPerformed
         logger.info("checkin event = {}", evt);
-        int i = jTable1.getSelectionModel().getLeadSelectionIndex();
+        int i = personTable.getSelectionModel().getLeadSelectionIndex();
         if (i >= 0) {
             formEventListener.checkin(i);
         }
@@ -152,12 +161,10 @@ public class TimeclockFrame extends javax.swing.JFrame implements ListSelectionL
 
     private void checkOutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkOutButtonActionPerformed
         logger.info("checkout event = {}", evt);
-        int i = jTable1.getSelectionModel().getLeadSelectionIndex();
+        int i = personTable.getSelectionModel().getLeadSelectionIndex();
         if (i >= 0) {
             formEventListener.checkout(i);
         }
-
-        formEventListener.checkout(jTable1.getSelectionModel().getLeadSelectionIndex());
     }//GEN-LAST:event_checkOutButtonActionPerformed
 
     @Override
@@ -165,11 +172,15 @@ public class TimeclockFrame extends javax.swing.JFrame implements ListSelectionL
         logger.info("selection event = {}", e);
         if (e.getValueIsAdjusting()) {
             // this is paranoia
-            if (e.getSource() == jTable1) {
-                Integer selection = jTable1.getSelectionModel().getLeadSelectionIndex();
+            if (e.getSource() == personTable) {
+                Integer selection = personTable.getSelectionModel().getLeadSelectionIndex();
                 formEventListener.personSelected(selection);
             }
         }
+    }
+    
+    public void setTimeText (String s) {
+        currentTime.setText(s);
     }
 
     private boolean windowClosing = false;
@@ -181,11 +192,12 @@ public class TimeclockFrame extends javax.swing.JFrame implements ListSelectionL
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton checkInButton;
     private javax.swing.JButton checkOutButton;
+    private javax.swing.JLabel currentTime;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable personTable;
     // End of variables declaration//GEN-END:variables
 }

@@ -22,7 +22,7 @@ public class TimeclockStatusModel implements TableModel {
     List<CurrentStatus> personsStatus = new ArrayList<>();
 
     public void reload() {
-        logger.info ("{} using dao {}", this, dao);
+        logger.info("{} using dao {}", this, dao);
         List<Person> persons = dao.fetchPersons();
         personsStatus.clear();
         for (Person p : persons) {
@@ -31,13 +31,14 @@ public class TimeclockStatusModel implements TableModel {
         }
         Collections.sort(personsStatus);
     }
-    
+
     public Person getPersonAt(int i) {
         return personsStatus.get(i).getPerson();
     }
 
     @Override
     public int getRowCount() {
+        logger.info ("personstatus = {}", personsStatus);
         return personsStatus.size();
     }
 
@@ -48,6 +49,7 @@ public class TimeclockStatusModel implements TableModel {
 
     @Override
     public String getColumnName(int columnIndex) {
+        logger.info ("asked for header for {}", columnIndex);
         switch (columnIndex) {
             case 0:
                 return "Name";
@@ -114,7 +116,7 @@ public class TimeclockStatusModel implements TableModel {
     @Autowired
     @Required
     public void setDao(DAO dao) {
-        logger.info ("{} got dao {}", this, dao);
+        logger.info("{} got dao {}", this, dao);
         this.dao = dao;
     }
 
@@ -129,7 +131,7 @@ public class TimeclockStatusModel implements TableModel {
             this.where = Where.UNKNOWN;
             this.when = null;
         }
-        
+
         public Person getPerson() {
             return person;
         }
@@ -162,6 +164,7 @@ public class TimeclockStatusModel implements TableModel {
     }
 
     enum Where {
+
         UNKNOWN(), IN(), OUT();
     }
 

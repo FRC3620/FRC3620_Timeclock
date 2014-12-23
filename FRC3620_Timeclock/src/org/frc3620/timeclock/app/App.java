@@ -1,5 +1,7 @@
 package org.frc3620.timeclock.app;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import org.frc3620.timeclock.db.DAO;
 import org.frc3620.timeclock.gui.FormEventListener;
 import org.frc3620.timeclock.gui.TimeclockFrame;
@@ -46,6 +48,8 @@ public class App implements FormEventListener {
             }
         });
 
+        String time = null;
+        SimpleDateFormat sdt = new SimpleDateFormat("HH:mm:ss");
         while (true) {
             boolean windowClosed = timeClockFrame.isWindowClosing();
             // logger.info ("timeClockFrame closed = {}", windowClosed);
@@ -55,6 +59,16 @@ public class App implements FormEventListener {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException ex) {
+            }
+
+            final String newTime = sdt.format(new Date());
+            if (!newTime.equals(time)) {
+                java.awt.EventQueue.invokeLater(new Runnable() {
+                    public void run() {
+                        timeClockFrame.setTimeText(newTime);
+                    }
+                });
+                time = newTime;
             }
         }
 
@@ -71,26 +85,27 @@ public class App implements FormEventListener {
         logger.info("{} set DAO to {}", this, dao);
         this.dao = dao;
     }
-    
+
     private TimeclockStatusModel timeclockStatusModel;
+
     @Autowired
-    public void setTimeclockStatusModel (TimeclockStatusModel timeclockStatusModel) {
+    public void setTimeclockStatusModel(TimeclockStatusModel timeclockStatusModel) {
         this.timeclockStatusModel = timeclockStatusModel;
     }
 
     @Override
     public void personSelected(Integer i) {
-        logger.info ("selected {}: {}", i, timeclockStatusModel.getPersonAt(i));
+        logger.info("selected {}: {}", i, timeclockStatusModel.getPersonAt(i));
     }
 
     @Override
     public void checkin(Integer i) {
-        logger.info ("checkin {}: {}", i, timeclockStatusModel.getPersonAt(i));
+        logger.info("checkin {}: {}", i, timeclockStatusModel.getPersonAt(i));
     }
 
     @Override
     public void checkout(Integer i) {
-        logger.info ("checkout {}: {}", i, timeclockStatusModel.getPersonAt(i));
+        logger.info("checkout {}: {}", i, timeclockStatusModel.getPersonAt(i));
     }
 
 }
