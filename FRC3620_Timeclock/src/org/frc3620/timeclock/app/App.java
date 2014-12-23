@@ -1,14 +1,8 @@
 package org.frc3620.timeclock.app;
 
-import java.util.Date;
-import java.util.List;
-import org.aspectj.weaver.loadtime.Aj;
-import org.frc3620.timeclock.CurrentStatus;
-import org.frc3620.timeclock.Person;
-import org.frc3620.timeclock.Where;
 import org.frc3620.timeclock.db.DAO;
-import org.frc3620.timeclock.gui.TimeClockFrame;
-import org.frc3620.timeclock.gui.TimeClockStatusModel;
+import org.frc3620.timeclock.gui.TimeclockFrame;
+import org.frc3620.timeclock.gui.TimeclockStatusModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +18,6 @@ public class App {
     Logger logger = LoggerFactory.getLogger(getClass());
 
     void go() {
-        logger.info("{} dao = {} ", this, dao);
-
-        List<Person> persons = dao.fetchPersons();
-        for (Person person : persons) {
-            logger.info("test1 = {} ", person);
-        }
-
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
@@ -48,12 +35,9 @@ public class App {
         //</editor-fold>
 
         //</editor-fold>
-        TimeClockStatusModel t = new TimeClockStatusModel();
-        t.addTimeClockStatus(new CurrentStatus(1, "Wegscheid, Douglas", Where.IN, new Date()));
-        t.addTimeClockStatus(new CurrentStatus(2, "Wegscheid, Tearesa", null, null));
-        t.addTimeClockStatus(new CurrentStatus(3, "Miller, Mike", Where.OUT, new Date()));
+        timeclockStatusModel.reload();
 
-        final TimeClockFrame timeClockFrame = new TimeClockFrame(t);
+        final TimeclockFrame timeClockFrame = new TimeclockFrame(timeclockStatusModel);
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -85,6 +69,12 @@ public class App {
     public void setDao(DAO dao) {
         logger.info("{} set DAO to {}", this, dao);
         this.dao = dao;
+    }
+    
+    private TimeclockStatusModel timeclockStatusModel;
+    @Autowired
+    public void setTimeclockStatusModel (TimeclockStatusModel timeclockStatusModel) {
+        this.timeclockStatusModel = timeclockStatusModel;
     }
 
 }
