@@ -30,7 +30,10 @@ public class TimeclockStatusModel implements TableModel {
             personsStatus.add(c);
         }
         Collections.sort(personsStatus);
-
+    }
+    
+    public Person getPersonAt(int i) {
+        return personsStatus.get(i).getPerson();
     }
 
     @Override
@@ -117,32 +120,22 @@ public class TimeclockStatusModel implements TableModel {
 
     class CurrentStatus implements Comparable<CurrentStatus> {
 
-        private Integer personId;
-        private String name;
+        private Person person;
         private Where where;
         private Date when;
 
         public CurrentStatus(Person person) {
-            this.personId = person.getPersonId();
-            this.name = person.getLastname() + ", " + person.getFirstname();
+            this.person = person;
             this.where = Where.UNKNOWN;
             this.when = null;
         }
-
-        public Integer getPersonId() {
-            return personId;
-        }
-
-        public void setPersonId(Integer personId) {
-            this.personId = personId;
+        
+        public Person getPerson() {
+            return person;
         }
 
         public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
+            return person.getLastname() + ", " + person.getFirstname();
         }
 
         public Where getWhere() {

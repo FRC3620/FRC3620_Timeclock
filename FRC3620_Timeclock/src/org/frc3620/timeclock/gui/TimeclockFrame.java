@@ -1,6 +1,10 @@
 package org.frc3620.timeclock.gui;
 
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
@@ -13,14 +17,18 @@ import org.slf4j.LoggerFactory;
  *
  * @author WEGSCD
  */
-public class TimeclockFrame extends javax.swing.JFrame {
+public class TimeclockFrame extends javax.swing.JFrame implements ListSelectionListener {
 
     Logger logger = LoggerFactory.getLogger(getClass());
+    FormEventListener formEventListener;
 
     /**
      * Creates new form TimeClockFrame
+     *
+     * @param t
      */
-    public TimeclockFrame(TableModel t) {
+    public TimeclockFrame(TableModel t, FormEventListener formEventListener) {
+        this.formEventListener = formEventListener;
         tableModel = t;
         tableColumnModel = new DefaultTableColumnModel();
         tableColumnModel.addColumn(new TableColumn(0, 200));
@@ -31,6 +39,10 @@ public class TimeclockFrame extends javax.swing.JFrame {
         tableColumnModel.getColumn(1).setCellRenderer(rRenderer);
         tableColumnModel.getColumn(2).setCellRenderer(new HHMMRenderer());
         initComponents();
+
+        jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jTable1.getSelectionModel().addListSelectionListener(this);
+        // setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
     }
 
     TableModel tableModel = null;
@@ -48,8 +60,8 @@ public class TimeclockFrame extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        checkInButton = new javax.swing.JButton();
+        checkOutButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
@@ -67,25 +79,35 @@ public class TimeclockFrame extends javax.swing.JFrame {
         jScrollPane1.setViewportView(jTable1);
         jTable1.setColumnModel(tableColumnModel);
 
-        jButton3.setText("Check In");
+        checkInButton.setText("Check In");
+        checkInButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkInButtonActionPerformed(evt);
+            }
+        });
 
-        jButton4.setText("Check Out");
+        checkOutButton.setText("Check Out");
+        checkOutButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkOutButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+                .addComponent(checkInButton, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE))
+                .addComponent(checkOutButton, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton3)
-                    .addComponent(jButton4))
+                    .addComponent(checkInButton)
+                    .addComponent(checkOutButton))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -120,6 +142,36 @@ public class TimeclockFrame extends javax.swing.JFrame {
         windowClosing = true;
     }//GEN-LAST:event_formWindowClosing
 
+    private void checkInButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkInButtonActionPerformed
+        logger.info("checkin event = {}", evt);
+        int i = jTable1.getSelectionModel().getLeadSelectionIndex();
+        if (i >= 0) {
+            formEventListener.checkin(i);
+        }
+    }//GEN-LAST:event_checkInButtonActionPerformed
+
+    private void checkOutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkOutButtonActionPerformed
+        logger.info("checkout event = {}", evt);
+        int i = jTable1.getSelectionModel().getLeadSelectionIndex();
+        if (i >= 0) {
+            formEventListener.checkout(i);
+        }
+
+        formEventListener.checkout(jTable1.getSelectionModel().getLeadSelectionIndex());
+    }//GEN-LAST:event_checkOutButtonActionPerformed
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        logger.info("selection event = {}", e);
+        if (e.getValueIsAdjusting()) {
+            // this is paranoia
+            if (e.getSource() == jTable1) {
+                Integer selection = jTable1.getSelectionModel().getLeadSelectionIndex();
+                formEventListener.personSelected(selection);
+            }
+        }
+    }
+
     private boolean windowClosing = false;
 
     public boolean isWindowClosing() {
@@ -127,8 +179,8 @@ public class TimeclockFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
+    private javax.swing.JButton checkInButton;
+    private javax.swing.JButton checkOutButton;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;

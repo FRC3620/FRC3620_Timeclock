@@ -1,6 +1,7 @@
 package org.frc3620.timeclock.app;
 
 import org.frc3620.timeclock.db.DAO;
+import org.frc3620.timeclock.gui.FormEventListener;
 import org.frc3620.timeclock.gui.TimeclockFrame;
 import org.frc3620.timeclock.gui.TimeclockStatusModel;
 import org.slf4j.Logger;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Component;
  * @author wegscd
  */
 @Component
-public class App {
+public class App implements FormEventListener {
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -37,7 +38,7 @@ public class App {
         //</editor-fold>
         timeclockStatusModel.reload();
 
-        final TimeclockFrame timeClockFrame = new TimeclockFrame(timeclockStatusModel);
+        final TimeclockFrame timeClockFrame = new TimeclockFrame(timeclockStatusModel, this);
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -75,6 +76,21 @@ public class App {
     @Autowired
     public void setTimeclockStatusModel (TimeclockStatusModel timeclockStatusModel) {
         this.timeclockStatusModel = timeclockStatusModel;
+    }
+
+    @Override
+    public void personSelected(Integer i) {
+        logger.info ("selected {}: {}", i, timeclockStatusModel.getPersonAt(i));
+    }
+
+    @Override
+    public void checkin(Integer i) {
+        logger.info ("checkin {}: {}", i, timeclockStatusModel.getPersonAt(i));
+    }
+
+    @Override
+    public void checkout(Integer i) {
+        logger.info ("checkout {}: {}", i, timeclockStatusModel.getPersonAt(i));
     }
 
 }
