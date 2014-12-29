@@ -62,6 +62,10 @@ public class Worksession {
     public void setOriginalEndDate(Date originalEndDate) {
         this.originalEndDate = originalEndDate;
     }
+    
+    public boolean isToday() {
+        return Utils.getStartOfDay(new Date()).before(startDate);
+    }
 
     @Override
     public String toString() {

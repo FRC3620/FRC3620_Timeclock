@@ -2,10 +2,13 @@ package org.frc3620.timeclock.app;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import org.frc3620.timeclock.Person;
+import org.frc3620.timeclock.Worksession;
 import org.frc3620.timeclock.db.DAO;
 import org.frc3620.timeclock.gui.FormEventListener;
 import org.frc3620.timeclock.gui.TimeclockFrame;
-import org.frc3620.timeclock.gui.TimeclockStatusModel;
+import org.frc3620.timeclock.gui.PersonsStatusModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,8 @@ import org.springframework.stereotype.Component;
 public class App implements FormEventListener {
 
     Logger logger = LoggerFactory.getLogger(getClass());
+    
+    TimeclockFrame timeclockFrame;
 
     void go() {
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -40,18 +45,19 @@ public class App implements FormEventListener {
         //</editor-fold>
         timeclockStatusModel.reload();
 
-        final TimeclockFrame timeClockFrame = new TimeclockFrame(timeclockStatusModel, this);
+        timeclockFrame = new TimeclockFrame(timeclockStatusModel, this);
+        final TimeclockFrame timeclockFrame2 = timeclockFrame;
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                timeClockFrame.setVisible(true);
+                timeclockFrame2.setVisible(true);
             }
         });
 
         String time = null;
         SimpleDateFormat sdt = new SimpleDateFormat("HH:mm:ss");
         while (true) {
-            boolean windowClosed = timeClockFrame.isWindowClosing();
+            boolean windowClosed = timeclockFrame.isWindowClosing();
             // logger.info ("timeClockFrame closed = {}", windowClosed);
             if (windowClosed) {
                 break;
@@ -65,7 +71,7 @@ public class App implements FormEventListener {
             if (!newTime.equals(time)) {
                 java.awt.EventQueue.invokeLater(new Runnable() {
                     public void run() {
-                        timeClockFrame.setTimeText(newTime);
+                        timeclockFrame.setTimeText(newTime);
                     }
                 });
                 time = newTime;
@@ -73,7 +79,7 @@ public class App implements FormEventListener {
         }
 
         logger.info("timeClockFrame closed");
-        timeClockFrame.setVisible(false);
+        timeclockFrame.setVisible(false);
         logger.info("app.go() exiting");
 
     }
@@ -86,18 +92,31 @@ public class App implements FormEventListener {
         this.dao = dao;
     }
 
-    private TimeclockStatusModel timeclockStatusModel;
+    private PersonsStatusModel timeclockStatusModel;
 
     @Autowired
-    public void setTimeclockStatusModel(TimeclockStatusModel timeclockStatusModel) {
+    public void setTimeclockStatusModel(PersonsStatusModel timeclockStatusModel) {
         this.timeclockStatusModel = timeclockStatusModel;
     }
 
     @Override
     public void personSelected(Integer i) {
-        logger.info("selected {}: {}", i, timeclockStatusModel.getPersonAt(i));
+        Person person = timeclockStatusModel.getPersonAt(i);
+        logger.info("selected {}: {}", i, person);
+        updatePersonInfoOnScreen(person);
     }
-
+    
+    void updatePersonInfoOnScreen (Person person) {
+        List<Worksession> worksessions = dao.fetchWorksessionsForPerson(person.getPersonId());
+        Worksession lastWorksession = (worksessions.size() > 0) ? worksessions.get(0) : null;
+        if (lastWorksession != null && lastWorksession.isToday() && lastWorksession.getEndDate() == null) {
+            timeclockFrame.setCheckInButtonEnabled(false);
+            timeclockFrame.setCheckOutButtonEnabled(true);
+        } else {
+            timeclockFrame.setCheckInButtonEnabled(true);
+            timeclockFrame.setCheckOutButtonEnabled(false);
+        }
+    }
     @Override
     public void checkin(Integer i) {
         logger.info("checkin {}: {}", i, timeclockStatusModel.getPersonAt(i));

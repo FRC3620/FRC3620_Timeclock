@@ -47,6 +47,9 @@
     <logger name="org.springframework.jdbc.core">
         <level value="INFO"/>
     </logger>
+    <logger name="org.frc3620.timeclock.gui.TimeclockFrame">
+        <level value="DEBUG" />
+    </logger>
     <logger name="org.frc3620">
         <level value="INFO" />
     </logger>

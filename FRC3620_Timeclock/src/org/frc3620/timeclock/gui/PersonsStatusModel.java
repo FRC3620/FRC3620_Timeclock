@@ -1,9 +1,12 @@
 package org.frc3620.timeclock.gui;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.*;
 import org.frc3620.timeclock.Person;
+import org.frc3620.timeclock.Utils;
+import org.frc3620.timeclock.Worksession;
 import org.frc3620.timeclock.db.DAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,10 +19,12 @@ import org.springframework.stereotype.Component;
  * @author wegscd
  */
 @Component
-public class TimeclockStatusModel implements TableModel {
+public class PersonsStatusModel implements TableModel {
 
     Logger logger = LoggerFactory.getLogger(getClass());
     List<CurrentStatus> personsStatus = new ArrayList<>();
+
+    SimpleDateFormat sdt = new SimpleDateFormat("HH:mm:ss");
 
     public void reload() {
         logger.info("{} using dao {}", this, dao);
@@ -38,7 +43,7 @@ public class TimeclockStatusModel implements TableModel {
 
     @Override
     public int getRowCount() {
-        logger.info ("personstatus = {}", personsStatus);
+        // logger.info("personstatus = {}", personsStatus);
         return personsStatus.size();
     }
 
@@ -49,7 +54,7 @@ public class TimeclockStatusModel implements TableModel {
 
     @Override
     public String getColumnName(int columnIndex) {
-        logger.info ("asked for header for {}", columnIndex);
+        logger.info("asked for header for {}", columnIndex);
         switch (columnIndex) {
             case 0:
                 return "Name";
@@ -70,7 +75,7 @@ public class TimeclockStatusModel implements TableModel {
             case 1:
                 return String.class;
             case 2:
-                return Date.class;
+                return String.class;
             default:
                 return Object.class;
         }
@@ -83,17 +88,29 @@ public class TimeclockStatusModel implements TableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
+        Object o = null;
         CurrentStatus s = personsStatus.get(rowIndex);
         switch (columnIndex) {
             case 0:
-                return s.getName();
+                o = s.getName();
+                break;
             case 1:
-                return s.getWhere();
+                o = s.getWhere();
+                break;
             case 2:
-                return s.getWhen();
+                if (s.getWhen() == null) {
+                    o = "";
+                } else {
+                    synchronized (sdt) {
+                        o = sdt.format(s.getWhen());
+                    }
+                }
+                break;
             default:
-                return String.format("column %d for person %s", columnIndex, s);
+                o = String.format("column %d for person %s", columnIndex, s);
         }
+        logger.info("Data for {} {}: {}", rowIndex, columnIndex, o);
+        return o;
     }
 
     @Override
@@ -128,8 +145,27 @@ public class TimeclockStatusModel implements TableModel {
 
         public CurrentStatus(Person person) {
             this.person = person;
-            this.where = Where.UNKNOWN;
-            this.when = null;
+
+            Worksession worksession = dao.fetchLastWorksessionForPerson(person);
+            Date beginningOfToday = Utils.getStartOfDay(new Date());
+            Date beginningOfLastSession = (worksession == null) ? null : worksession.getStartDate();
+            logger.info("person: {}, today: {}, last session start: {}", person.getPersonId(), beginningOfToday, beginningOfLastSession);
+            if (worksession != null && worksession.isToday()) {
+                if (worksession.getEndDate() == null) {
+                    logger.info("in");
+                    this.where = Where.IN;
+                    this.when = worksession.getStartDate();
+                } else {
+                    logger.info("out");
+                    this.where = Where.OUT;
+                    this.when = worksession.getEndDate();
+                }
+            } else {
+                // last worksession does not exist or was a previous day
+                logger.info("unknown");
+                this.where = Where.UNKNOWN;
+                this.when = null;
+            }
         }
 
         public Person getPerson() {

@@ -36,13 +36,13 @@ public class DAO {
         List<Person> persons = jdbcTemplate.query(sql.toString(), args, personMapper);
         return persons;
     }
-    
+
     public List<Person> fetchPersons() {
         Map<String, Object> m = Collections.emptyMap();
         return fetchPersons("", m);
     }
 
-    public List<Worksession> fetchWorksessions(String where, Map<String, Object> args) {
+    public List<Worksession> fetchWorksessions(String where, String post, Map<String, Object> args) {
         StringBuilder sql = new StringBuilder();
         sql.append("select * from SA.WORKSESSIONS ");
         if (where != null && where.length() > 0) {
@@ -51,17 +51,35 @@ public class DAO {
             sql.append(" ");
         }
         sql.append("ORDER BY START_DATE DESC");
-        // logger.info(sql.toString());
+        if (post != null) {
+            sql.append(" ");
+            sql.append(post);
+        }
+        logger.info("query: sql={} {}", sql, args);
 
         List<Worksession> rv = jdbcTemplate.query(sql.toString(), args, worksessionMapper);
+        
+        logger.info ("query: received {} rows", rv.size());
         return rv;
+    }
+
+    public List<Worksession> fetchWorksessions(String where, Map<String, Object> args) {
+        return fetchWorksessions(where, null, args);
+    }
+
+    public Worksession fetchLastWorksessionForPerson(Person person) {
+        Map<String, Object> args = new HashMap<>();
+        args.put("person_id", person.getPersonId());
+        String where = "person_id = :person_id";
+        List<Worksession> rv = fetchWorksessions(where, "LIMIT 1", args);
+        return justOne(rv, "lastworksession");
     }
 
     public List<Worksession> fetchWorksessionsForPerson(Integer personId) {
         Map<String, Object> args = new TreeMap<>();
         args.put("person_id", personId);
         String where = "person_id = :person_id";
-        return fetchWorksessions(where, args);
+        return fetchWorksessions(where, null, args);
     }
 
     <T> T justOne(List<T> l, String with) {
@@ -83,7 +101,6 @@ public class DAO {
         }
         return l.get(0);
     }
-    
 
     private NamedParameterJdbcTemplate jdbcTemplate;
 
