@@ -8,7 +8,8 @@ import org.frc3620.timeclock.Worksession;
 import org.frc3620.timeclock.db.DAO;
 import org.frc3620.timeclock.gui.FormEventListener;
 import org.frc3620.timeclock.gui.TimeclockFrame;
-import org.frc3620.timeclock.gui.PersonsStatusModel;
+import org.frc3620.timeclock.gui.PersonsStatusTableModel;
+import org.frc3620.timeclock.gui.WorksessionTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +44,9 @@ public class App implements FormEventListener {
         //</editor-fold>
 
         //</editor-fold>
-        timeclockStatusModel.reload();
+        personsStatusTableModel.reload();
 
-        timeclockFrame = new TimeclockFrame(timeclockStatusModel, this);
+        timeclockFrame = new TimeclockFrame(personsStatusTableModel, worksessionTableModel,this);
         final TimeclockFrame timeclockFrame2 = timeclockFrame;
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -92,16 +93,22 @@ public class App implements FormEventListener {
         this.dao = dao;
     }
 
-    private PersonsStatusModel timeclockStatusModel;
+    private PersonsStatusTableModel personsStatusTableModel;
+    private WorksessionTableModel worksessionTableModel;
 
     @Autowired
-    public void setTimeclockStatusModel(PersonsStatusModel timeclockStatusModel) {
-        this.timeclockStatusModel = timeclockStatusModel;
+    public void setPersonsStatusTableModel (PersonsStatusTableModel t) {
+        this.personsStatusTableModel = t;
+    }
+    
+    @Autowired
+    public void setWorksessionTableModel(WorksessionTableModel w) {
+        this.worksessionTableModel = w;
     }
 
     @Override
     public void personSelected(Integer i) {
-        Person person = timeclockStatusModel.getPersonAt(i);
+        Person person = personsStatusTableModel.getPersonAt(i);
         logger.info("selected {}: {}", i, person);
         updatePersonInfoOnScreen(person);
     }
@@ -116,15 +123,26 @@ public class App implements FormEventListener {
             timeclockFrame.setCheckInButtonEnabled(true);
             timeclockFrame.setCheckOutButtonEnabled(false);
         }
+        worksessionTableModel.reload(person);
     }
     @Override
     public void checkin(Integer i) {
-        logger.info("checkin {}: {}", i, timeclockStatusModel.getPersonAt(i));
+        Person person = personsStatusTableModel.getPersonAt(i);
+        logger.info("checkin {}: {}", i, person);
+        dao.createWorksession (person);
+        personsStatusTableModel.reload(person);
+        personsStatusTableModel.fireTableRowsUpdated(i, i);
+        updatePersonInfoOnScreen(person);
     }
 
     @Override
     public void checkout(Integer i) {
-        logger.info("checkout {}: {}", i, timeclockStatusModel.getPersonAt(i));
+        Person person = personsStatusTableModel.getPersonAt(i);
+        logger.info("checkout {}: {}", i, person);
+        dao.closeWorksession (worksessionTableModel.getLastWorksession());
+        personsStatusTableModel.reload(person);
+        personsStatusTableModel.fireTableRowsUpdated(i, i);
+        updatePersonInfoOnScreen(person);
     }
 
 }

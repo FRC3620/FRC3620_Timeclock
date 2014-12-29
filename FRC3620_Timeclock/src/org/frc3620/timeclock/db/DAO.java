@@ -21,6 +21,28 @@ public class DAO {
     BeanPropertyRowMapper<Person> personMapper = BeanPropertyRowMapper.newInstance(Person.class);
     BeanPropertyRowMapper<Worksession> worksessionMapper = BeanPropertyRowMapper
             .newInstance(Worksession.class);
+    
+    public void createWorksession (Person person) {
+        Map<String, Object> args = new HashMap<>();
+        args.put("person_id", person.getPersonId());
+        args.put("start", new Date());
+        jdbcTemplate.update ("insert into SA.WORKSESSIONS (PERSON_ID, START_DATE, ORIGINAL_START_DATE) VALUES (:person_id, :start, :start)", args);
+    }
+    
+    public void closeWorksession (Worksession worksession) {
+        Map<String, Object> args = new HashMap<>();
+        args.put("worksession_id", worksession.getWorksessionId());
+        args.put("end", new Date());
+        jdbcTemplate.update ("update SA.WORKSESSIONS SET END_DATE = :end, ORIGINAL_END_DATE = :end WHERE WORKSESSION_ID = :worksession_id", args);
+    }
+
+    public Person fetchPerson(Integer id) {
+        Map<String, Object> args = new HashMap<>();
+        args.put("person_id", id);
+        String where = "person_id = :person_id";
+        List<Person> rv = fetchPersons(where, args);
+        return justOne(rv, "person");
+    }
 
     public List<Person> fetchPersons(String where, Map<String, Object> args) {
         StringBuilder sql = new StringBuilder();

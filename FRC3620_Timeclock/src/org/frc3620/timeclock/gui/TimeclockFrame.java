@@ -1,6 +1,5 @@
 package org.frc3620.timeclock.gui;
 
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -25,19 +24,16 @@ public class TimeclockFrame extends javax.swing.JFrame {
     /**
      * Creates new form TimeClockFrame
      *
-     * @param t
+     * @param personsStatusTableModel
+     * @param formEventListener
      */
-    public TimeclockFrame(TableModel t, FormEventListener formEventListener) {
+    public TimeclockFrame(PersonsStatusTableModel personsStatusTableModel, WorksessionTableModel worksessionTableModel, FormEventListener formEventListener) {
         this.formEventListener = formEventListener;
-        tableModel = t;
-        tableColumnModel = new DefaultTableColumnModel();
-        tableColumnModel.addColumn(new TableColumn(0, 200));
-        tableColumnModel.addColumn(new TableColumn(1, 50));
-        tableColumnModel.addColumn(new TableColumn(2, 50));
-        DefaultTableCellRenderer rRenderer = new DefaultTableCellRenderer();
-        rRenderer.setHorizontalAlignment(JLabel.CENTER);
-        tableColumnModel.getColumn(1).setCellRenderer(rRenderer);
-        tableColumnModel.getColumn(2).setCellRenderer(new HHMMRenderer());
+        this.personsTableModel = personsStatusTableModel;
+        personsTableColumnModel = personsStatusTableModel.getTableColumnModel();
+        this.worksessionTableModel = worksessionTableModel;
+        worksessionTableColumnModel = worksessionTableModel.getTableColumnModel();
+
         initComponents();
 
         personsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -45,8 +41,10 @@ public class TimeclockFrame extends javax.swing.JFrame {
         // setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
     }
 
-    TableModel tableModel = null;
-    TableColumnModel tableColumnModel = null;
+    TableModel personsTableModel = null;
+    TableColumnModel personsTableColumnModel = null;
+    WorksessionTableModel worksessionTableModel = null;
+    TableColumnModel worksessionTableColumnModel = null;
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -65,7 +63,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
         checkInButton = new javax.swing.JButton();
         checkOutButton = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        worksessionTable = new javax.swing.JTable();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
@@ -83,7 +81,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
         currentTime.setText("hh:mm:ss");
         currentTime.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
-        personsTable.setModel(tableModel);
+        personsTable.setModel(personsTableModel);
         jScrollPane1.setViewportView(personsTable);
 
         personNameLabel.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
@@ -107,18 +105,9 @@ public class TimeclockFrame extends javax.swing.JFrame {
             }
         });
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane2.setViewportView(jTable1);
+        worksessionTable.setModel(worksessionTableModel);
+        jScrollPane2.setViewportView(worksessionTable);
+        worksessionTable.setColumnModel(worksessionTableColumnModel);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -201,13 +190,11 @@ public class TimeclockFrame extends javax.swing.JFrame {
 
     public void setCheckInButtonEnabled(boolean b) {
         checkInButton.setEnabled(b);
-        checkInButton.repaint();
         logger.debug("checkinButtonEnabled: {}", b);
     }
 
     public void setCheckOutButtonEnabled(boolean b) {
         checkOutButton.setEnabled(b);
-        checkOutButton.repaint();
         logger.debug("checkOutButtonEnabled: {}", b);
     }
 
@@ -242,8 +229,8 @@ public class TimeclockFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable1;
     private javax.swing.JLabel personNameLabel;
     private javax.swing.JTable personsTable;
+    private javax.swing.JTable worksessionTable;
     // End of variables declaration//GEN-END:variables
 }

@@ -2,6 +2,7 @@ package org.frc3620.timeclock.gui;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import javax.swing.JLabel;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.*;
 import org.frc3620.timeclock.Person;
@@ -19,12 +20,24 @@ import org.springframework.stereotype.Component;
  * @author wegscd
  */
 @Component
-public class PersonsStatusModel implements TableModel {
+public class PersonsStatusTableModel extends AbstractTableModel {
 
     Logger logger = LoggerFactory.getLogger(getClass());
     List<CurrentStatus> personsStatus = new ArrayList<>();
 
     SimpleDateFormat sdt = new SimpleDateFormat("HH:mm:ss");
+
+    public TableColumnModel getTableColumnModel() {
+        TableColumnModel rv = new DefaultTableColumnModel();
+        rv.addColumn(new TableColumn(0, 200));
+        rv.addColumn(new TableColumn(1, 50));
+        rv.addColumn(new TableColumn(2, 50));
+        DefaultTableCellRenderer rRenderer = new DefaultTableCellRenderer();
+        rRenderer.setHorizontalAlignment(JLabel.CENTER);
+        rv.getColumn(1).setCellRenderer(rRenderer);
+        rv.getColumn(2).setCellRenderer(new HHMMRenderer());
+        return rv;
+    }
 
     public void reload() {
         logger.info("{} using dao {}", this, dao);
@@ -34,7 +47,20 @@ public class PersonsStatusModel implements TableModel {
             CurrentStatus c = new CurrentStatus(p);
             personsStatus.add(c);
         }
+        
         Collections.sort(personsStatus);
+    }
+    
+    public void reload (Person p) {
+        for (int i = 0; i < personsStatus.size(); i++) {
+            if (personsStatus.get(i).getPerson().getPersonId().equals(p.getPersonId())) {
+                Person p1 = dao.fetchPerson(p.getPersonId());
+                CurrentStatus c = new CurrentStatus(p1);
+                personsStatus.set(i, c);
+                return;
+            }
+        }
+        logger.error ("could not find person {} in model", p);
     }
 
     public Person getPersonAt(int i) {
@@ -118,16 +144,6 @@ public class PersonsStatusModel implements TableModel {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    @Override
-    public void addTableModelListener(TableModelListener l) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void removeTableModelListener(TableModelListener l) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
     DAO dao;
 
     @Autowired
@@ -203,5 +219,5 @@ public class PersonsStatusModel implements TableModel {
 
         UNKNOWN(), IN(), OUT();
     }
-
+    
 }
