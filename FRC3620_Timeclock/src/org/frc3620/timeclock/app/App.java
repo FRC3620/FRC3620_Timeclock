@@ -115,6 +115,7 @@ public class App implements FormEventListener {
     
     void updatePersonInfoOnScreen (Person person) {
         List<Worksession> worksessions = dao.fetchWorksessionsForPerson(person.getPersonId());
+        timeclockFrame.setPersonNameText(person.getFirstname() + " " + person.getLastname());
         Worksession lastWorksession = (worksessions.size() > 0) ? worksessions.get(0) : null;
         if (lastWorksession != null && lastWorksession.isToday() && lastWorksession.getEndDate() == null) {
             timeclockFrame.setCheckInButtonEnabled(false);

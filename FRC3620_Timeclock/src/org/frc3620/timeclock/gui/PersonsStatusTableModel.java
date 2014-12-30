@@ -30,8 +30,11 @@ public class PersonsStatusTableModel extends AbstractTableModel {
     public TableColumnModel getTableColumnModel() {
         TableColumnModel rv = new DefaultTableColumnModel();
         rv.addColumn(new TableColumn(0, 200));
+        rv.getColumn(0).setHeaderValue("Name");
         rv.addColumn(new TableColumn(1, 50));
+        rv.getColumn(1).setHeaderValue("Status");
         rv.addColumn(new TableColumn(2, 50));
+        rv.getColumn(2).setHeaderValue("When");
         DefaultTableCellRenderer rRenderer = new DefaultTableCellRenderer();
         rRenderer.setHorizontalAlignment(JLabel.CENTER);
         rv.getColumn(1).setCellRenderer(rRenderer);
@@ -76,21 +79,6 @@ public class PersonsStatusTableModel extends AbstractTableModel {
     @Override
     public int getColumnCount() {
         return 3;
-    }
-
-    @Override
-    public String getColumnName(int columnIndex) {
-        logger.info("asked for header for {}", columnIndex);
-        switch (columnIndex) {
-            case 0:
-                return "Name";
-            case 1:
-                return "Status";
-            case 2:
-                return "When";
-            default:
-                return "" + columnIndex;
-        }
     }
 
     @Override

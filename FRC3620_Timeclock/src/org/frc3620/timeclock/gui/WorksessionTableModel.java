@@ -24,17 +24,21 @@ public class WorksessionTableModel extends AbstractTableModel {
     List<Worksession> worksessions = new ArrayList<>();
 
     SimpleDateFormat hhmmssFormat = new SimpleDateFormat("HH:mm:ss");
-    SimpleDateFormat dayFormat = new SimpleDateFormat("MMM dd, YYYY");
+    SimpleDateFormat dayFormat = new SimpleDateFormat("MMM dd, yyyy");
 
     public TableColumnModel getTableColumnModel() {
         TableColumnModel rv = new DefaultTableColumnModel();
         rv.addColumn(new TableColumn(0, 200));
+        rv.getColumn(0).setHeaderValue("Date");
         rv.addColumn(new TableColumn(1, 50));
+        rv.getColumn(1).setHeaderValue("In");
         rv.addColumn(new TableColumn(2, 50));
+        rv.getColumn(2).setHeaderValue("Outcha");
         DefaultTableCellRenderer rRenderer = new DefaultTableCellRenderer();
         rRenderer.setHorizontalAlignment(JLabel.CENTER);
+        rv.getColumn(0).setCellRenderer(rRenderer);
         rv.getColumn(1).setCellRenderer(rRenderer);
-        rv.getColumn(2).setCellRenderer(new HHMMRenderer());
+        rv.getColumn(2).setCellRenderer(rRenderer);
         return rv;
     }
 
@@ -53,21 +57,6 @@ public class WorksessionTableModel extends AbstractTableModel {
     @Override
     public int getColumnCount() {
         return 3;
-    }
-
-    @Override
-    public String getColumnName(int columnIndex) {
-        logger.info("asked for header for {}", columnIndex);
-        switch (columnIndex) {
-            case 0:
-                return "Date";
-            case 1:
-                return "In";
-            case 2:
-                return "Out";
-            default:
-                return "" + columnIndex;
-        }
     }
 
     @Override
@@ -100,6 +89,7 @@ public class WorksessionTableModel extends AbstractTableModel {
                 } else {
                     synchronized (dayFormat) {
                         o = dayFormat.format(s.getStartDate());
+                        logger.info ("format {} to {}", s.getStartDate(), o);
                     }
                 }
                 break;

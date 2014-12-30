@@ -43,7 +43,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
 
     TableModel personsTableModel = null;
     TableColumnModel personsTableColumnModel = null;
-    WorksessionTableModel worksessionTableModel = null;
+    TableModel worksessionTableModel = null;
     TableColumnModel worksessionTableColumnModel = null;
 
     /**
@@ -56,13 +56,13 @@ public class TimeclockFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         currentTime = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        personScrollPane = new javax.swing.JScrollPane();
         personsTable = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         personNameLabel = new javax.swing.JLabel();
         checkInButton = new javax.swing.JButton();
         checkOutButton = new javax.swing.JButton();
-        jScrollPane2 = new javax.swing.JScrollPane();
+        worksessionScrollPane = new javax.swing.JScrollPane();
         worksessionTable = new javax.swing.JTable();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
@@ -82,11 +82,11 @@ public class TimeclockFrame extends javax.swing.JFrame {
         currentTime.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         personsTable.setModel(personsTableModel);
-        jScrollPane1.setViewportView(personsTable);
+        personScrollPane.setViewportView(personsTable);
+        personsTable.setColumnModel(personsTableColumnModel);
 
         personNameLabel.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         personNameLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        personNameLabel.setText("X");
         personNameLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         checkInButton.setText("Check In");
@@ -106,7 +106,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
         });
 
         worksessionTable.setModel(worksessionTableModel);
-        jScrollPane2.setViewportView(worksessionTable);
+        worksessionScrollPane.setViewportView(worksessionTable);
         worksessionTable.setColumnModel(worksessionTableColumnModel);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -118,18 +118,18 @@ public class TimeclockFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(checkOutButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(personNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 384, Short.MAX_VALUE)
+            .addComponent(worksessionScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 384, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(personNameLabel)
+                .addComponent(personNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(checkInButton)
                     .addComponent(checkOutButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addComponent(worksessionScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 332, Short.MAX_VALUE))
         );
 
         jMenu1.setText("File");
@@ -145,7 +145,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(personScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -156,7 +156,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(0, 24, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
+                    .addComponent(personScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
@@ -201,6 +201,10 @@ public class TimeclockFrame extends javax.swing.JFrame {
     public void setTimeText(String s) {
         currentTime.setText(s);
     }
+    
+    public void setPersonNameText (String s) {
+        personNameLabel.setText(s);
+    }
 
     private boolean windowClosing = false;
 
@@ -227,10 +231,10 @@ public class TimeclockFrame extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel personNameLabel;
+    private javax.swing.JScrollPane personScrollPane;
     private javax.swing.JTable personsTable;
+    private javax.swing.JScrollPane worksessionScrollPane;
     private javax.swing.JTable worksessionTable;
     // End of variables declaration//GEN-END:variables
 }
