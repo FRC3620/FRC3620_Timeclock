@@ -31,9 +31,9 @@ public class PersonsStatusTableModel extends AbstractTableModel {
         TableColumnModel rv = new DefaultTableColumnModel();
         rv.addColumn(new TableColumn(0, 200));
         rv.getColumn(0).setHeaderValue("Name");
-        rv.addColumn(new TableColumn(1, 50));
+        rv.addColumn(new TableColumn(1, 80));
         rv.getColumn(1).setHeaderValue("Status");
-        rv.addColumn(new TableColumn(2, 50));
+        rv.addColumn(new TableColumn(2, 80));
         rv.getColumn(2).setHeaderValue("When");
         DefaultTableCellRenderer rRenderer = new DefaultTableCellRenderer();
         rRenderer.setHorizontalAlignment(JLabel.CENTER);

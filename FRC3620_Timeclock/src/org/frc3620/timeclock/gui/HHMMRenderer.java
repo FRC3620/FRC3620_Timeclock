@@ -14,8 +14,8 @@ public class HHMMRenderer extends DefaultTableCellRenderer {
     
     public HHMMRenderer() {
         super();
-        setHorizontalAlignment(JLabel.RIGHT);
-        setForeground(Color.red);
+        setHorizontalAlignment(JLabel.CENTER);
+        // setForeground(Color.red);
     }
 
     private Format formatter = new SimpleDateFormat("hh:mm");
