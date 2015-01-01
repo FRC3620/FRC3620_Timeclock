@@ -33,10 +33,10 @@ public class WorksessionTableModel extends AbstractTableModel {
         rv.addColumn(new TableColumn(1, 50));
         rv.getColumn(1).setHeaderValue("In");
         rv.addColumn(new TableColumn(2, 50));
-        rv.getColumn(2).setHeaderValue("Outcha");
+        rv.getColumn(2).setHeaderValue("Out");
         DefaultTableCellRenderer rRenderer = new DefaultTableCellRenderer();
         rRenderer.setHorizontalAlignment(JLabel.CENTER);
-        rv.getColumn(0).setCellRenderer(rRenderer);
+        // rv.getColumn(0).setCellRenderer(rRenderer);
         rv.getColumn(1).setCellRenderer(rRenderer);
         rv.getColumn(2).setCellRenderer(rRenderer);
         return rv;

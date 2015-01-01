@@ -38,7 +38,7 @@ public class PersonsStatusTableModel extends AbstractTableModel {
         DefaultTableCellRenderer rRenderer = new DefaultTableCellRenderer();
         rRenderer.setHorizontalAlignment(JLabel.CENTER);
         rv.getColumn(1).setCellRenderer(rRenderer);
-        rv.getColumn(2).setCellRenderer(new HHMMRenderer());
+        rv.getColumn(2).setCellRenderer(rRenderer);
         return rv;
     }
 
@@ -156,11 +156,11 @@ public class PersonsStatusTableModel extends AbstractTableModel {
             logger.info("person: {}, today: {}, last session start: {}", person.getPersonId(), beginningOfToday, beginningOfLastSession);
             if (worksession != null && worksession.isToday()) {
                 if (worksession.getEndDate() == null) {
-                    logger.info("in");
+                    logger.info("punching in");
                     this.where = Where.IN;
                     this.when = worksession.getStartDate();
                 } else {
-                    logger.info("out");
+                    logger.info("punching out");
                     this.where = Where.OUT;
                     this.when = worksession.getEndDate();
                 }

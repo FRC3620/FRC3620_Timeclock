@@ -1,5 +1,16 @@
 package org.frc3620.timeclock.gui;
 
+import java.awt.FlowLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -20,20 +31,53 @@ public class TimeclockFrame extends javax.swing.JFrame {
     /**
      * Creates new form TimeClockFrame
      *
-     * @param personsStatusTableModel
+     * @param _personsStatusTableModel
      * @param formEventListener
      */
-    public TimeclockFrame(PersonsStatusTableModel personsStatusTableModel, WorksessionTableModel worksessionTableModel, FormEventListener formEventListener) {
-        this.formEventListener = formEventListener;
-        this.personsTableModel = personsStatusTableModel;
-        personsTableColumnModel = personsStatusTableModel.getTableColumnModel();
-        this.worksessionTableModel = worksessionTableModel;
-        worksessionTableColumnModel = worksessionTableModel.getTableColumnModel();
+    public TimeclockFrame(PersonsStatusTableModel _personsStatusTableModel, WorksessionTableModel _worksessionTableModel, FormEventListener _formEventListener) {
+        this.formEventListener = _formEventListener;
+        this.personsTableModel = _personsStatusTableModel;
+        personsTableColumnModel = _personsStatusTableModel.getTableColumnModel();
+        this.worksessionTableModel = _worksessionTableModel;
+        worksessionTableColumnModel = _worksessionTableModel.getTableColumnModel();
 
         initComponents();
 
         personsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        personsTable.getSelectionModel().addListSelectionListener(new TimeclockFrame.PersonsTableSelectionListener());
+        personsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                logger.info("selection event = {}", e);
+                if (e.getValueIsAdjusting()) {
+                    Integer selection = personsTable.getSelectionModel().getLeadSelectionIndex();
+                    formEventListener.personSelected(selection);
+                }
+            }
+        }
+        );
+
+        worksessionTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                int r = worksessionTable.rowAtPoint(e.getPoint());
+                if (r >= 0 && r < worksessionTable.getRowCount()) {
+                    worksessionTable.setRowSelectionInterval(r, r);
+                } else {
+                    worksessionTable.clearSelection();
+                }
+
+                int rowindex = worksessionTable.getSelectedRow();
+                if (rowindex < 0) {
+                    return;
+                }
+                if (e.isPopupTrigger() && e.getComponent() instanceof JTable) {
+                    worksessionTablePopupMenu.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        });
+
+        jMenuBar1.add(mentorModeMenuItem);
         // setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
     }
 
@@ -42,18 +86,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
     TableModel worksessionTableModel = null;
     TableColumnModel worksessionTableColumnModel = null;
 
-    private void formWindowClosing(java.awt.event.WindowEvent evt) {                                   
-        logger.info("window closing event fired");
-        windowClosing = true;
-    }                                  
-
-    private void checkOutButtonActionPerformed(java.awt.event.ActionEvent evt) {                                               
-        logger.info("checkout event = {}", evt);
-        int i = personsTable.getSelectionModel().getLeadSelectionIndex();
-        if (i >= 0) {
-            formEventListener.checkout(i);
-        }
-    }                                              
+    MouseAdapter worksessionTableMouseAdapter = null;
 
     public void setCheckInButtonEnabled(boolean b) {
         checkinButton.setEnabled(b);
@@ -68,9 +101,13 @@ public class TimeclockFrame extends javax.swing.JFrame {
     public void setTimeText(String s) {
         currentTime.setText(s);
     }
-    
-    public void setPersonNameText (String s) {
+
+    public void setPersonNameText(String s) {
         personNameLabel.setText(s);
+    }
+    
+    public boolean isMentorMode() {
+        return mentorModeMenuItem.isSelected();
     }
 
     private boolean windowClosing = false;
@@ -78,19 +115,34 @@ public class TimeclockFrame extends javax.swing.JFrame {
     public boolean isWindowClosing() {
         return windowClosing;
     }
-    
-        class PersonsTableSelectionListener implements ListSelectionListener {
-        @Override
-        public void valueChanged(ListSelectionEvent e) {
-            logger.info("selection event = {}", e);
-            if (e.getValueIsAdjusting()) {
-                Integer selection = personsTable.getSelectionModel().getLeadSelectionIndex();
-                formEventListener.personSelected(selection);
+
+    class PasswordPanel extends JPanel {
+
+        private final JPasswordField passwordField = new JPasswordField(12);
+        private boolean gainedFocusBefore;
+
+        /**
+         * "Hook" method that causes the JPasswordField to request focus the
+         * first time this method is called.
+         */
+        void gainedFocus() {
+            if (!gainedFocusBefore) {
+                gainedFocusBefore = true;
+                passwordField.requestFocusInWindow();
             }
         }
+
+        public PasswordPanel() {
+            super(new FlowLayout());
+
+            add(new JLabel("Password: "));
+            add(passwordField);
+        }
+
+        public char[] getPassword() {
+            return passwordField.getPassword();
+        }
     }
-
-
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -101,6 +153,9 @@ public class TimeclockFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        worksessionTablePopupMenu = new javax.swing.JPopupMenu();
+        worksessionPopupMenuItem1 = new javax.swing.JMenuItem();
+        mentorModeMenuItem = new javax.swing.JCheckBoxMenuItem();
         currentTime = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         personsTable = new javax.swing.JTable();
@@ -111,10 +166,38 @@ public class TimeclockFrame extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         worksessionTable = new javax.swing.JTable();
         jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
-        jMenu2 = new javax.swing.JMenu();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        worksessionPopupMenuItem1.setText("jMenuItem1");
+        worksessionPopupMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                worksessionPopupMenuItem1ActionPerformed(evt);
+            }
+        });
+        worksessionTablePopupMenu.add(worksessionPopupMenuItem1);
+
+        mentorModeMenuItem.setText("Mentor Mode");
+        mentorModeMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mentorModeMenuItemActionPerformed(evt);
+            }
+        });
+        mentorModeMenuItem.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                mentorModeMenuItemPropertyChange(evt);
+            }
+        });
+        mentorModeMenuItem.addVetoableChangeListener(new java.beans.VetoableChangeListener() {
+            public void vetoableChange(java.beans.PropertyChangeEvent evt)throws java.beans.PropertyVetoException {
+                mentorModeMenuItemVetoableChange(evt);
+            }
+        });
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         currentTime.setFont(new java.awt.Font("Courier New", 0, 24)); // NOI18N
         currentTime.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -171,12 +254,6 @@ public class TimeclockFrame extends javax.swing.JFrame {
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
         );
 
-        jMenu1.setText("File");
-        jMenuBar1.add(jMenu1);
-
-        jMenu2.setText("Edit");
-        jMenuBar1.add(jMenu2);
-
         setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -195,7 +272,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
                 .addComponent(currentTime, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 349, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 370, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
 
@@ -218,18 +295,58 @@ public class TimeclockFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_checkoutButtonActionPerformed
 
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        logger.info("window closing event fired");
+        windowClosing = true;
+    }//GEN-LAST:event_formWindowClosing
+    private void worksessionPopupMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_worksessionPopupMenuItem1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_worksessionPopupMenuItem1ActionPerformed
+
+    private void mentorModeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mentorModeMenuItemActionPerformed
+        logger.info("mentorModeMenuItem, selected {}, evt {}", mentorModeMenuItem.isSelected(), evt);
+        if (mentorModeMenuItem.isSelected()) {
+            JPanel panel = new JPanel();
+            JLabel label = new JLabel("Enter a password:");
+            JPasswordField pass = new JPasswordField(10);
+            panel.add(label);
+            panel.add(pass);
+            String[] options = new String[]{"OK", "Cancel"};
+            int option = JOptionPane.showOptionDialog(null, panel, "Mentor Password",
+                    JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+                    null, options, options[0]);
+            if (option == 0) // pressing OK button
+            {
+                String password = new String(pass.getPassword());
+                System.out.println("Your password is: " + new String(password));
+                if (!"".equals(password)) {
+                    mentorModeMenuItem.setSelected(false);
+                }
+            }
+        }
+    }//GEN-LAST:event_mentorModeMenuItemActionPerformed
+
+    private void mentorModeMenuItemVetoableChange(java.beans.PropertyChangeEvent evt)throws java.beans.PropertyVetoException {//GEN-FIRST:event_mentorModeMenuItemVetoableChange
+        logger.info ("vetoable change {}", evt); // TODO add your handling code here:
+    }//GEN-LAST:event_mentorModeMenuItemVetoableChange
+
+    private void mentorModeMenuItemPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_mentorModeMenuItemPropertyChange
+        logger.info ("property change {}", evt); // TODO add your handling code here:
+    }//GEN-LAST:event_mentorModeMenuItemPropertyChange
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton checkinButton;
     private javax.swing.JButton checkoutButton;
     private javax.swing.JLabel currentTime;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JCheckBoxMenuItem mentorModeMenuItem;
     private javax.swing.JLabel personNameLabel;
     private javax.swing.JTable personsTable;
+    private javax.swing.JMenuItem worksessionPopupMenuItem1;
     private javax.swing.JTable worksessionTable;
+    private javax.swing.JPopupMenu worksessionTablePopupMenu;
     // End of variables declaration//GEN-END:variables
 }
