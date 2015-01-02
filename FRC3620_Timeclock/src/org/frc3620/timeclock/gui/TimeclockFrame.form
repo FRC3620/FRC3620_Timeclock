@@ -27,8 +27,6 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mentorModeMenuItemActionPerformed"/>
-        <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="mentorModeMenuItemPropertyChange"/>
-        <EventHandler event="vetoableChange" listener="java.beans.VetoableChangeListener" parameters="java.beans.PropertyChangeEvent" handler="mentorModeMenuItemVetoableChange"/>
       </Events>
     </Component>
     <Menu class="javax.swing.JMenuBar" name="jMenuBar1">

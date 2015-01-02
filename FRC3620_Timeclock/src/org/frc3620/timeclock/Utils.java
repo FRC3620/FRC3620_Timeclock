@@ -39,4 +39,15 @@ public class Utils {
         calendar.set(Calendar.MILLISECOND, 999);
         return calendar.getTime();
     }
+    static public Date getTimeOfDay(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int h = calendar.get(Calendar.HOUR);
+        int m = calendar.get(Calendar.MINUTE);
+        int s = calendar.get(Calendar.SECOND);
+        int ms = calendar.get(Calendar.MILLISECOND);
+        calendar.set(1970, Calendar.JANUARY, 1, h, m, s);
+        calendar.set(Calendar.MILLISECOND, ms);
+        return calendar.getTime();
+    }
 }

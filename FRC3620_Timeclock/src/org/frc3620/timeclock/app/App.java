@@ -151,14 +151,12 @@ public class App implements FormEventListener {
     }
 
     @Override
-    public void editWorksession(Integer i) {
-        Worksession worksession = worksessionTableModel.getWorksessionAt(i);
-        logger.info ("editing worksession @ {}: {}", i, worksession);
-        worksessionEditForm.setStartTime(worksession.getStartDate());
-        worksessionEditForm.setEndTime (worksession.getEndDate());
-        worksessionEditForm.setPreviousStartTime(worksession.getStartDate().toString());
-        worksessionEditForm.setPreviousEndTime(worksession.getEndDate().toString());
-        boolean okHit = worksessionEditForm.showDialog();
+    public void editWorksession(Integer p, Integer w) {
+        Person person = personsStatusTableModel.getPersonAt(p);
+        Worksession worksession = worksessionTableModel.getWorksessionAt(w);
+        logger.info ("editing worksession @ {}: {}", w, worksession);
+        worksessionEditForm.setPersonTitle(person.getFirstname() + " " + person.getLastname());
+        boolean okHit = worksessionEditForm.showDialog(worksession.getStartDate(), worksession.getEndDate());
         if (okHit) {
             Date newStartTime = worksessionEditForm.getStartTime();
             Date newEndTime = worksessionEditForm.getEndTime();

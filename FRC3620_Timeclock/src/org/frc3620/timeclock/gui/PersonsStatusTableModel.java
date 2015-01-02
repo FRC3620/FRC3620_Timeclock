@@ -3,7 +3,6 @@ package org.frc3620.timeclock.gui;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.swing.JLabel;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.*;
 import org.frc3620.timeclock.Person;
 import org.frc3620.timeclock.Utils;
@@ -123,7 +122,7 @@ public class PersonsStatusTableModel extends AbstractTableModel {
             default:
                 o = String.format("column %d for person %s", columnIndex, s);
         }
-        logger.info("Data for {} {}: {}", rowIndex, columnIndex, o);
+        logger.debug("Data for {} {}: {}", rowIndex, columnIndex, o);
         return o;
     }
 
@@ -156,17 +155,14 @@ public class PersonsStatusTableModel extends AbstractTableModel {
             logger.info("person: {}, today: {}, last session start: {}", person.getPersonId(), beginningOfToday, beginningOfLastSession);
             if (worksession != null && worksession.isToday()) {
                 if (worksession.getEndDate() == null) {
-                    logger.info("punching in");
                     this.where = Where.IN;
                     this.when = worksession.getStartDate();
                 } else {
-                    logger.info("punching out");
                     this.where = Where.OUT;
                     this.when = worksession.getEndDate();
                 }
             } else {
                 // last worksession does not exist or was a previous day
-                logger.info("unknown");
                 this.where = Where.UNKNOWN;
                 this.when = null;
             }

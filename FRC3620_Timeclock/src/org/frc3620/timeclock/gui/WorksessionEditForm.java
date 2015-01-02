@@ -1,7 +1,8 @@
 package org.frc3620.timeclock.gui;
 
-import java.util.Date;
-import javax.swing.SpinnerDateModel;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.text.DefaultFormatter;
 import org.frc3620.timeclock.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
  * @author wegscd
  */
 public class WorksessionEditForm extends javax.swing.JDialog {
+
     Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
@@ -21,50 +23,97 @@ public class WorksessionEditForm extends javax.swing.JDialog {
         startTimeModel = new SpinnerDateModel();
         endTimeModel = new SpinnerDateModel();
         initComponents();
+
+        startTimeModel.setCalendarField(Calendar.MINUTE);
+        JSpinner.DateEditor se = new JSpinner.DateEditor(startSpinner, "h:mm a");
+        startSpinner.setEditor(se);
+        {
+            JFormattedTextField field = (JFormattedTextField) se.getComponent(0);
+            DefaultFormatter formatter = (DefaultFormatter) field.getFormatter();
+            formatter.setCommitsOnValidEdit(true);
+        }
+
+        endTimeModel.setCalendarField(Calendar.MINUTE);
+        JSpinner.DateEditor ee = new JSpinner.DateEditor(endSpinner, "h:mm a");
+        endSpinner.setEditor(ee);
+        {
+            JFormattedTextField field = (JFormattedTextField) ee.getComponent(0);
+            DefaultFormatter formatter = (DefaultFormatter) field.getFormatter();
+            formatter.setCommitsOnValidEdit(true);
+        }
+
     }
-    
-    public void setPersonTitle (String s) {
+
+    void resetSpinnerMaxMin() {
+        Calendar cal1 = GregorianCalendar.getInstance();
+        cal1.clear();
+        cal1.set(1970, Calendar.JANUARY, 1, 0, 0, 0);
+        Date min = cal1.getTime();
+        startTimeModel.setStart(min);
+
+        Calendar cal2 = GregorianCalendar.getInstance();
+        cal2.clear();
+        cal2.set(1970, Calendar.JANUARY, 1, 23, 59, 59);
+        cal2.set (Calendar.MILLISECOND, 999);
+        Date max = cal2.getTime();
+        endTimeModel.setEnd(max);
+
+    }
+
+    public void setPersonTitle(String s) {
         titleLabel.setText(s);
     }
-    
-    public void setPreviousStartTime (String s) {
+
+    void setPreviousStartTime(String s) {
         previousStartTimeLabel.setText(s);
     }
-    
-    public void setPreviousEndTime (String s) {
-        previousEndTimeLabe.setText(s);
+
+    void setPreviousEndTime(String s) {
+        previousEndTimeLabel.setText(s);
     }
-    
-    public void setStartTime (Date d) {
-        startTimeModel.setValue(d);
-        startTimeModel.setStart(Utils.getStartOfDay(d));
-        startTimeModel.setEnd (Utils.getEndOfDay(d));
-        logger.info ("set start time {} {} {}", startTimeModel.getStart(), startTimeModel.getDate(), startTimeModel.getEnd());
+
+    void setStartTime(Date d) {
+        Date d0 = Utils.getTimeOfDay(d);
+        startTimeModel.setValue(d0);
+        endTimeModel.setStart(d0);
+        logger.info("set start time {} -> {}", d, d0);
+        logSpinners();
     }
-    
-    public void setEndTime (Date d) {
-        endTimeModel.setValue(d);
-        endTimeModel.setStart(Utils.getStartOfDay(d));
-        endTimeModel.setEnd(Utils.getEndOfDay(d));
-        logger.info ("set end time {} {} {}", endTimeModel.getStart(), endTimeModel.getDate(), endTimeModel.getEnd());
+
+    void setEndTime(Date d) {
+        Date d0 = Utils.getTimeOfDay(d);
+        endTimeModel.setValue(d0);
+        startTimeModel.setEnd(d0);
+        logger.info("set end time {} -> {}", d, d0);
+        logSpinners();
     }
-    
+
     boolean okHit = false;
-    
-    public boolean showDialog() {
+
+    public boolean showDialog(Date s, Date e) {
+        resetSpinnerMaxMin();
+        setStartTime(s);
+        setPreviousStartTime(s.toString());
+        setEndTime(e);
+        setPreviousEndTime(e == null ? "" : e.toString());
         okHit = false;
         setVisible(true);
         return okHit;
     }
     
+    void logSpinners() {
+        logger.info ("start spinner {} {} {}", startTimeModel.getStart(), startTimeModel.getDate(), startTimeModel.getEnd());
+        logger.info ("  end spinner {} {} {}", endTimeModel.getStart(), endTimeModel.getDate(), endTimeModel.getEnd());
+    }
+
     public Date getStartTime() {
         return startTimeModel.getDate();
     }
-    
+
     public Date getEndTime() {
         return endTimeModel.getDate();
     }
-    
+
     SpinnerDateModel startTimeModel, endTimeModel;
 
     /**
@@ -84,14 +133,14 @@ public class WorksessionEditForm extends javax.swing.JDialog {
         startSpinner = new javax.swing.JSpinner();
         endSpinner = new javax.swing.JSpinner();
         previousStartTimeLabel = new javax.swing.JLabel();
-        previousEndTimeLabe = new javax.swing.JLabel();
+        previousEndTimeLabel = new javax.swing.JLabel();
         titleLabel = new javax.swing.JLabel();
         okButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
 
         jButton3.setText("jButton3");
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Edit Worksession");
 
         jLabel1.setText("Start Time");
 
@@ -102,11 +151,22 @@ public class WorksessionEditForm extends javax.swing.JDialog {
         jLabel4.setText("Previous End Time");
 
         startSpinner.setModel(startTimeModel);
+        startSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                startSpinnerStateChanged(evt);
+            }
+        });
 
         endSpinner.setModel(endTimeModel);
+        endSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                endSpinnerStateChanged(evt);
+            }
+        });
 
         titleLabel.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
-        titleLabel.setText("jLabel7");
+        titleLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        titleLabel.setText("Title");
 
         okButton.setText("OK");
         okButton.addActionListener(new java.awt.event.ActionListener() {
@@ -137,7 +197,7 @@ public class WorksessionEditForm extends javax.swing.JDialog {
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(endSpinner, javax.swing.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE)
-                            .addComponent(previousEndTimeLabe, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(previousEndTimeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(okButton)
                         .addGap(18, 18, 18)
@@ -176,7 +236,7 @@ public class WorksessionEditForm extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(previousEndTimeLabe))
+                    .addComponent(previousEndTimeLabel))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(okButton)
@@ -189,12 +249,31 @@ public class WorksessionEditForm extends javax.swing.JDialog {
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
         okHit = true;
-        setVisible (false);
+        Date s = startTimeModel.getDate();
+        Date e = endTimeModel.getDate();
+        if (!s.before(e)) {
+            JOptionPane.showMessageDialog(null, "Sorry, start time needs to be before end time");
+        } else {
+            logger.info ("date fields: {} {}", s, e);
+            setVisible(false);
+        }
     }//GEN-LAST:event_okButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        setVisible (false);
+        setVisible(false);
     }//GEN-LAST:event_cancelButtonActionPerformed
+
+    private void startSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_startSpinnerStateChanged
+        logger.info("start spinner change event: {}", startSpinner.getValue());
+        endTimeModel.setStart((Date) startSpinner.getValue());
+        logSpinners();
+    }//GEN-LAST:event_startSpinnerStateChanged
+
+    private void endSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_endSpinnerStateChanged
+        logger.info("end spinner change event: {}", endSpinner.getValue());
+        startTimeModel.setEnd((Date) endSpinner.getValue());
+        logSpinners();
+    }//GEN-LAST:event_endSpinnerStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
@@ -205,7 +284,7 @@ public class WorksessionEditForm extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JButton okButton;
-    private javax.swing.JLabel previousEndTimeLabe;
+    private javax.swing.JLabel previousEndTimeLabel;
     private javax.swing.JLabel previousStartTimeLabel;
     private javax.swing.JSpinner startSpinner;
     private javax.swing.JLabel titleLabel;

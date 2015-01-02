@@ -9,7 +9,7 @@
     </Component>
   </NonVisualComponents>
   <Properties>
-    <Property name="defaultCloseOperation" type="int" value="2"/>
+    <Property name="title" type="java.lang.String" value="Edit Worksession"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
@@ -42,7 +42,7 @@
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="endSpinner" pref="187" max="32767" attributes="0"/>
-                          <Component id="previousEndTimeLabe" max="32767" attributes="0"/>
+                          <Component id="previousEndTimeLabel" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <Group type="102" attributes="0">
@@ -95,7 +95,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="previousEndTimeLabe" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="previousEndTimeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -134,6 +134,9 @@
           <Connection code="startTimeModel" type="code"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="startSpinnerStateChanged"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JSpinner" name="endSpinner">
       <Properties>
@@ -141,17 +144,21 @@
           <Connection code="endTimeModel" type="code"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="endSpinnerStateChanged"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="previousStartTimeLabel">
     </Component>
-    <Component class="javax.swing.JLabel" name="previousEndTimeLabe">
+    <Component class="javax.swing.JLabel" name="previousEndTimeLabel">
     </Component>
     <Component class="javax.swing.JLabel" name="titleLabel">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Tahoma" size="24" style="1"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="jLabel7"/>
+        <Property name="horizontalAlignment" type="int" value="0"/>
+        <Property name="text" type="java.lang.String" value="Title"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="okButton">

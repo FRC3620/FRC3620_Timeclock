@@ -32,7 +32,8 @@ public class TimeclockFrame extends javax.swing.JFrame {
      * Creates new form TimeClockFrame
      *
      * @param _personsStatusTableModel
-     * @param formEventListener
+     * @param _worksessionTableModel
+     * @param _formEventListener
      */
     public TimeclockFrame(PersonsStatusTableModel _personsStatusTableModel, WorksessionTableModel _worksessionTableModel, FormEventListener _formEventListener) {
         this.formEventListener = _formEventListener;
@@ -48,7 +49,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                logger.info("selection event = {}", e);
+                logger.debug("person table selection event = {}", e);
                 if (e.getValueIsAdjusting()) {
                     Integer selection = personsTable.getSelectionModel().getLeadSelectionIndex();
                     formEventListener.personSelected(selection);
@@ -184,16 +185,6 @@ public class TimeclockFrame extends javax.swing.JFrame {
                 mentorModeMenuItemActionPerformed(evt);
             }
         });
-        mentorModeMenuItem.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                mentorModeMenuItemPropertyChange(evt);
-            }
-        });
-        mentorModeMenuItem.addVetoableChangeListener(new java.beans.VetoableChangeListener() {
-            public void vetoableChange(java.beans.PropertyChangeEvent evt)throws java.beans.PropertyVetoException {
-                mentorModeMenuItemVetoableChange(evt);
-            }
-        });
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -283,7 +274,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void checkinButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkinButtonActionPerformed
-        logger.info("checkin event = {}", evt);
+        logger.debug("checkin event = {}", evt);
         int i = personsTable.getSelectionModel().getLeadSelectionIndex();
         if (i >= 0) {
             formEventListener.checkin(i);
@@ -291,7 +282,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_checkinButtonActionPerformed
 
     private void checkoutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkoutButtonActionPerformed
-        logger.info("checkout event = {}", evt);
+        logger.debug("checkout event = {}", evt);
         int i = personsTable.getSelectionModel().getLeadSelectionIndex();
         if (i >= 0) {
             formEventListener.checkout(i);
@@ -299,15 +290,17 @@ public class TimeclockFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_checkoutButtonActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        logger.info("window closing event fired");
+        logger.debug("window closing event fired");
         windowClosing = true;
     }//GEN-LAST:event_formWindowClosing
     private void worksessionEditMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_worksessionEditMenuItemActionPerformed
-        formEventListener.editWorksession(worksessionTable.getSelectionModel().getLeadSelectionIndex());
+        int p = personsTable.getSelectionModel().getLeadSelectionIndex();
+        int w = worksessionTable.getSelectionModel().getLeadSelectionIndex();
+        formEventListener.editWorksession(p, w);
     }//GEN-LAST:event_worksessionEditMenuItemActionPerformed
 
     private void mentorModeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mentorModeMenuItemActionPerformed
-        logger.info("mentorModeMenuItem, selected {}, evt {}", mentorModeMenuItem.isSelected(), evt);
+        logger.debug("mentorModeMenuItem, selected {}, evt {}", mentorModeMenuItem.isSelected(), evt);
         if (mentorModeMenuItem.isSelected()) {
             final PasswordPanel pPnl = new PasswordPanel();
             String[] options = new String[]{"OK", "Cancel"};
@@ -327,21 +320,13 @@ public class TimeclockFrame extends javax.swing.JFrame {
             dlg.setVisible(true);
             if (op.getValue() != null && op.getValue().equals(JOptionPane.OK_OPTION)) {
                 String password = new String(pPnl.getPassword());
-                System.out.println("Your password is: " + new String(password));
+                System.out.println("Your password is: " + password);
                 if (!"".equals(password)) {
                     mentorModeMenuItem.setSelected(false);
                 }
             }
         }
     }//GEN-LAST:event_mentorModeMenuItemActionPerformed
-
-    private void mentorModeMenuItemVetoableChange(java.beans.PropertyChangeEvent evt)throws java.beans.PropertyVetoException {//GEN-FIRST:event_mentorModeMenuItemVetoableChange
-        logger.info("vetoable change {}", evt); // TODO add your handling code here:
-    }//GEN-LAST:event_mentorModeMenuItemVetoableChange
-
-    private void mentorModeMenuItemPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_mentorModeMenuItemPropertyChange
-        logger.info("property change {}", evt); // TODO add your handling code here:
-    }//GEN-LAST:event_mentorModeMenuItemPropertyChange
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton checkinButton;

@@ -89,7 +89,6 @@ public class WorksessionTableModel extends AbstractTableModel {
                 } else {
                     synchronized (dayFormat) {
                         o = dayFormat.format(s.getStartDate());
-                        logger.info ("format {} to {}", s.getStartDate(), o);
                     }
                 }
                 break;
@@ -114,7 +113,7 @@ public class WorksessionTableModel extends AbstractTableModel {
             default:
                 o = String.format("column %d for person %s", columnIndex, s);
         }
-        logger.info("Data for {} {}: {}", rowIndex, columnIndex, o);
+        logger.debug("Data for {} {}: {}", rowIndex, columnIndex, o);
         return o;
     }
     
