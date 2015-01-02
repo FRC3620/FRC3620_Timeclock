@@ -50,4 +50,11 @@ public class Utils {
         calendar.set(Calendar.MILLISECOND, ms);
         return calendar.getTime();
     }
+    
+    static public Date dropFractionalSeconds (Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
+    }
 }
