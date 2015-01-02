@@ -60,6 +60,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
         worksessionTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
+                if (!isMentorMode()) return;
                 int r = worksessionTable.rowAtPoint(e.getPoint());
                 if (r >= 0 && r < worksessionTable.getRowCount()) {
                     worksessionTable.setRowSelectionInterval(r, r);
@@ -105,7 +106,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
     public void setPersonNameText(String s) {
         personNameLabel.setText(s);
     }
-    
+
     public boolean isMentorMode() {
         return mentorModeMenuItem.isSelected();
     }
@@ -154,7 +155,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         worksessionTablePopupMenu = new javax.swing.JPopupMenu();
-        worksessionPopupMenuItem1 = new javax.swing.JMenuItem();
+        worksessionEditMenuItem = new javax.swing.JMenuItem();
         mentorModeMenuItem = new javax.swing.JCheckBoxMenuItem();
         currentTime = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -167,13 +168,15 @@ public class TimeclockFrame extends javax.swing.JFrame {
         worksessionTable = new javax.swing.JTable();
         jMenuBar1 = new javax.swing.JMenuBar();
 
-        worksessionPopupMenuItem1.setText("jMenuItem1");
-        worksessionPopupMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        worksessionTablePopupMenu.setLabel("Worksession Context Menu");
+
+        worksessionEditMenuItem.setText("Edit Worksession");
+        worksessionEditMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                worksessionPopupMenuItem1ActionPerformed(evt);
+                worksessionEditMenuItemActionPerformed(evt);
             }
         });
-        worksessionTablePopupMenu.add(worksessionPopupMenuItem1);
+        worksessionTablePopupMenu.add(worksessionEditMenuItem);
 
         mentorModeMenuItem.setText("Mentor Mode");
         mentorModeMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -299,25 +302,31 @@ public class TimeclockFrame extends javax.swing.JFrame {
         logger.info("window closing event fired");
         windowClosing = true;
     }//GEN-LAST:event_formWindowClosing
-    private void worksessionPopupMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_worksessionPopupMenuItem1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_worksessionPopupMenuItem1ActionPerformed
+    private void worksessionEditMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_worksessionEditMenuItemActionPerformed
+        formEventListener.editWorksession(worksessionTable.getSelectionModel().getLeadSelectionIndex());
+    }//GEN-LAST:event_worksessionEditMenuItemActionPerformed
 
     private void mentorModeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mentorModeMenuItemActionPerformed
         logger.info("mentorModeMenuItem, selected {}, evt {}", mentorModeMenuItem.isSelected(), evt);
         if (mentorModeMenuItem.isSelected()) {
-            JPanel panel = new JPanel();
-            JLabel label = new JLabel("Enter a password:");
-            JPasswordField pass = new JPasswordField(10);
-            panel.add(label);
-            panel.add(pass);
+            final PasswordPanel pPnl = new PasswordPanel();
             String[] options = new String[]{"OK", "Cancel"};
-            int option = JOptionPane.showOptionDialog(null, panel, "Mentor Password",
-                    JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+            JOptionPane op = new JOptionPane(pPnl, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
                     null, options, options[0]);
-            if (option == 0) // pressing OK button
-            {
-                String password = new String(pass.getPassword());
+
+            JDialog dlg = op.createDialog("Who Goes There?");
+
+            // Wire up FocusListener to ensure JPasswordField is able to request focus when the dialog is first shown.
+            dlg.addWindowFocusListener(new WindowAdapter() {
+                @Override
+                public void windowGainedFocus(WindowEvent e) {
+                    pPnl.gainedFocus();
+                }
+            });
+            
+            dlg.setVisible(true);
+            if (op.getValue() != null && op.getValue().equals(JOptionPane.OK_OPTION)) {
+                String password = new String(pPnl.getPassword());
                 System.out.println("Your password is: " + new String(password));
                 if (!"".equals(password)) {
                     mentorModeMenuItem.setSelected(false);
@@ -327,11 +336,11 @@ public class TimeclockFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_mentorModeMenuItemActionPerformed
 
     private void mentorModeMenuItemVetoableChange(java.beans.PropertyChangeEvent evt)throws java.beans.PropertyVetoException {//GEN-FIRST:event_mentorModeMenuItemVetoableChange
-        logger.info ("vetoable change {}", evt); // TODO add your handling code here:
+        logger.info("vetoable change {}", evt); // TODO add your handling code here:
     }//GEN-LAST:event_mentorModeMenuItemVetoableChange
 
     private void mentorModeMenuItemPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_mentorModeMenuItemPropertyChange
-        logger.info ("property change {}", evt); // TODO add your handling code here:
+        logger.info("property change {}", evt); // TODO add your handling code here:
     }//GEN-LAST:event_mentorModeMenuItemPropertyChange
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -345,7 +354,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
     private javax.swing.JCheckBoxMenuItem mentorModeMenuItem;
     private javax.swing.JLabel personNameLabel;
     private javax.swing.JTable personsTable;
-    private javax.swing.JMenuItem worksessionPopupMenuItem1;
+    private javax.swing.JMenuItem worksessionEditMenuItem;
     private javax.swing.JTable worksessionTable;
     private javax.swing.JPopupMenu worksessionTablePopupMenu;
     // End of variables declaration//GEN-END:variables

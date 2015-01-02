@@ -125,6 +125,10 @@ public class WorksessionTableModel extends AbstractTableModel {
             return null;
         }
     }
+    
+    public Worksession getWorksessionAt (int i) {
+        return worksessions.get(i);
+    }
 
     DAO dao;
 

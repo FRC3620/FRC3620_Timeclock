@@ -9,6 +9,7 @@ import org.frc3620.timeclock.db.DAO;
 import org.frc3620.timeclock.gui.FormEventListener;
 import org.frc3620.timeclock.gui.PersonsStatusTableModel;
 import org.frc3620.timeclock.gui.TimeclockFrame;
+import org.frc3620.timeclock.gui.WorksessionEditForm;
 import org.frc3620.timeclock.gui.WorksessionTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ public class App implements FormEventListener {
     Logger logger = LoggerFactory.getLogger(getClass());
     
     TimeclockFrame timeclockFrame;
+    WorksessionEditForm worksessionEditForm;
 
     void go() {
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -47,6 +49,8 @@ public class App implements FormEventListener {
         personsStatusTableModel.reload();
 
         timeclockFrame = new TimeclockFrame(personsStatusTableModel, worksessionTableModel,this);
+        worksessionEditForm = new WorksessionEditForm(timeclockFrame, true);
+        
         final TimeclockFrame timeclockFrame2 = timeclockFrame;
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -144,6 +148,22 @@ public class App implements FormEventListener {
         personsStatusTableModel.reload(person);
         personsStatusTableModel.fireTableRowsUpdated(i, i);
         updatePersonInfoOnScreen(person);
+    }
+
+    @Override
+    public void editWorksession(Integer i) {
+        Worksession worksession = worksessionTableModel.getWorksessionAt(i);
+        logger.info ("editing worksession @ {}: {}", i, worksession);
+        worksessionEditForm.setStartTime(worksession.getStartDate());
+        worksessionEditForm.setEndTime (worksession.getEndDate());
+        worksessionEditForm.setPreviousStartTime(worksession.getStartDate().toString());
+        worksessionEditForm.setPreviousEndTime(worksession.getEndDate().toString());
+        boolean okHit = worksessionEditForm.showDialog();
+        if (okHit) {
+            Date newStartTime = worksessionEditForm.getStartTime();
+            Date newEndTime = worksessionEditForm.getEndTime();
+            logger.info ("new start {}, end {}", newStartTime, newEndTime);
+        }
     }
 
 }

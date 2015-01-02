@@ -21,6 +21,7 @@ public class Utils {
 
     static public Date getStartOfDay(Date date) {
         Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DATE);
@@ -30,6 +31,7 @@ public class Utils {
 
     static public Date getEndOfDay(Date date) {
         Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DATE);
