@@ -1,5 +1,6 @@
 package org.frc3620.timeclock.gui;
 
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -342,6 +343,11 @@ public class TimeclockFrame extends javax.swing.JFrame {
                 logger.info("did not hit ok");
                 formEventListener.mentorMode(null);
             }
+        }
+        if (mentorModeMenuItem.isSelected()) {
+            mentorModeMenuItem.setForeground(Color.red);
+        } else {
+            mentorModeMenuItem.setForeground(Color.black);
         }
     }//GEN-LAST:event_mentorModeMenuItemActionPerformed
 

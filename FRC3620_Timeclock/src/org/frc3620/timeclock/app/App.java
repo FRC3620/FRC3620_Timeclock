@@ -177,6 +177,10 @@ public class App implements FormEventListener {
                 dao.updateEndTime(worksession, newEndTime, mentor);
             }
         }
+        personsStatusTableModel.reload(person);
+        personsStatusTableModel.fireTableRowsUpdated(personIndex, personIndex);
+        updatePersonInfoOnScreen(person);
+
     }
 
     @Override
@@ -186,7 +190,7 @@ public class App implements FormEventListener {
         } else {
             mentor = personsStatusTableModel.getPersonAt(personIndex);
         }
-        logger.info ("mentor index is {}, {}", personIndex, mentor);
+        logger.info("mentor index is {}, {}", personIndex, mentor);
     }
 
 }

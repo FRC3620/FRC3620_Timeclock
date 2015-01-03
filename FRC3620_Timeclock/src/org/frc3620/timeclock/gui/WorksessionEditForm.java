@@ -25,6 +25,7 @@ public class WorksessionEditForm extends javax.swing.JDialog {
 
     /**
      * Creates new form NewJDialog
+     *
      * @param parent
      * @param modal
      */
@@ -90,27 +91,22 @@ public class WorksessionEditForm extends javax.swing.JDialog {
         previousEndTimeLabel.setText(s);
     }
 
-    void setEndTime(Date d) {
-        Date d0 = Utils.getTimeOfDay(d);
-        endTimeModel.setValue(d0);
-        logger.debug("set end time {} -> {}", d, d0);
-        logSpinners("setEndTime");
-    }
-
     public boolean showDialog(Date s, Date e) {
         originalStartTime = Utils.dropFractionalSeconds(s);
         originalEndTime = Utils.dropFractionalSeconds(e);
 
-        originalStartTime0 = Utils.getTimeOfDay(s);
-        startTimeModel.setValue(originalStartTime0);
+        originalStartTime0 = Utils.getTimeOfDay(originalStartTime);
         logger.debug("set start time {} -> {}", s, originalStartTime0);
-
-        originalEndTime0 = Utils.getTimeOfDay(e);
-        endTimeModel.setValue(originalEndTime0);
-        logger.debug("set end time {} -> {}", e, originalEndTime0);
-
+        startTimeModel.setValue(originalStartTime0);
         setPreviousStartTime(originalStartTime0);
-        setEndTime((null != originalEndTime0) ? originalEndTime0 : originalStartTime0);
+
+        originalEndTime0 = Utils.getTimeOfDay(originalEndTime);
+        logger.debug("set end time {} -> {}", e, originalEndTime0);
+        if (null != originalEndTime0) {
+            endTimeModel.setValue(originalEndTime0);
+        } else {
+            endTimeModel.setValue(originalStartTime0);
+        }
         setPreviousEndTime(originalEndTime0);
 
         endDateIsNullCheckbox.setSelected(null == originalEndTime);
@@ -137,9 +133,9 @@ public class WorksessionEditForm extends javax.swing.JDialog {
     }
 
     void logSpinners(String s) {
-        logger.debug("logging spinners: {}", s);
-        logger.debug("start spinner {} {} {} {}", diagDate(startTimeModel.getStart()), diagDate(startTimeModel.getDate()), diagDate(startSpinner.getValue()), diagDate(startTimeModel.getEnd()));
-        logger.debug("  end spinner {} {} {} {}", diagDate(endTimeModel.getStart()), diagDate(endTimeModel.getDate()), diagDate(endSpinner.getValue()), diagDate(endTimeModel.getEnd()));
+        logger.info("logging spinners: {}", s);
+        logger.info("start spinner {} {} {} {}", diagDate(startTimeModel.getStart()), diagDate(startTimeModel.getDate()), diagDate(startSpinner.getValue()), diagDate(startTimeModel.getEnd()));
+        logger.info("  end spinner {} {} {} {}", diagDate(endTimeModel.getStart()), diagDate(endTimeModel.getDate()), diagDate(endSpinner.getValue()), diagDate(endTimeModel.getEnd()));
     }
 
     public boolean isStartTimeChanged() {
@@ -148,27 +144,32 @@ public class WorksessionEditForm extends javax.swing.JDialog {
 
     public boolean isEndTimeChanged() {
         if (null == originalEndTime0) {
-            return ! endDateIsNullCheckbox.isSelected();
+            return !endDateIsNullCheckbox.isSelected();
         } else {
-            return !originalEndTime0.equals(endTimeModel.getDate());
+            if (endDateIsNullCheckbox.isSelected()) {
+                return true;
+            } else {
+                return !originalEndTime0.equals(endTimeModel.getDate());
+            }
         }
     }
 
     public Date getStartTime() {
         Date rv = Utils.makeCompositeDate(originalStartTime, startTimeModel.getDate());
-        logger.info ("getStartTime = {}", rv);
+        logger.info("getStartTime = {}", rv);
         return rv;
     }
 
     public Date getEndTime() {
         Date rv = null;
         if (!endDateIsNullCheckbox.isSelected()) {
-            rv = Utils.makeCompositeDate(originalEndTime, endTimeModel.getDate());
+            Date d = (null == originalEndTime) ? originalStartTime : originalEndTime;
+            rv = Utils.makeCompositeDate(d, endTimeModel.getDate());
         }
-        logger.info ("getEndTime = {}", rv);
+        logger.info("getEndTime = {}", rv);
         return rv;
     }
-    
+
     void updateEndSpinnerEnabled() {
         endSpinner.setEnabled(!endDateIsNullCheckbox.isSelected());
     }
@@ -340,8 +341,8 @@ public class WorksessionEditForm extends javax.swing.JDialog {
         okHit = true;
         Date s = startTimeModel.getDate();
         Date e = endTimeModel.getDate();
-        if (!s.before(e)) {
-            JOptionPane.showMessageDialog(null, "Sorry, start time needs to be before end time");
+        if (s.after(e)) {
+            JOptionPane.showMessageDialog(null, "Sorry, start time needs to be before or same as end time");
         } else {
             logger.info("date fields: {} {}", s, e);
             setVisible(false);
