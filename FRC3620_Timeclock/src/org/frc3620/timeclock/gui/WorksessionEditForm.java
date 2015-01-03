@@ -19,12 +19,14 @@ public class WorksessionEditForm extends javax.swing.JDialog {
     static final String DATE_FORMAT = "hh:mm:ss a";
     final SimpleDateFormat sdt = new SimpleDateFormat(DATE_FORMAT);
 
+    Date originalStartTime, originalEndTime, originalStartTime0, originalEndTime0;
     SpinnerDateModel startTimeModel, endTimeModel;
     boolean okHit = false;
-    boolean settingUp = true;
 
     /**
      * Creates new form NewJDialog
+     * @param parent
+     * @param modal
      */
     public WorksessionEditForm(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -39,7 +41,7 @@ public class WorksessionEditForm extends javax.swing.JDialog {
         resetSpinnerMaxMin();
     }
 
-    void fixupDateEditor(JSpinner e) {
+    private void fixupDateEditor(JSpinner e) {
         JComponent rv = e.getEditor();
         JFormattedTextField field = (JFormattedTextField) rv.getComponent(0);
         DefaultFormatter formatter = (DefaultFormatter) field.getFormatter();
@@ -47,7 +49,7 @@ public class WorksessionEditForm extends javax.swing.JDialog {
         formatter.setAllowsInvalid(false);
     }
 
-    void resetSpinnerMaxMin() {
+    private void resetSpinnerMaxMin() {
         Calendar cal1 = GregorianCalendar.getInstance();
         cal1.clear();
         cal1.set(1970, Calendar.JANUARY, 1, 0, 0, 0);
@@ -88,32 +90,32 @@ public class WorksessionEditForm extends javax.swing.JDialog {
         previousEndTimeLabel.setText(s);
     }
 
-    void setStartTime(Date d) {
-        Date d0 = Utils.getTimeOfDay(d);
-        startTimeModel.setValue(d0);
-        logger.info("set start time {} -> {}", d, d0);
-        logSpinners("setStartTime");
-    }
-
     void setEndTime(Date d) {
         Date d0 = Utils.getTimeOfDay(d);
         endTimeModel.setValue(d0);
-        logger.info("set end time {} -> {}", d, d0);
+        logger.debug("set end time {} -> {}", d, d0);
         logSpinners("setEndTime");
     }
 
     public boolean showDialog(Date s, Date e) {
-        s = Utils.dropFractionalSeconds(s);
-        if (null != e) e = Utils.dropFractionalSeconds(e);
-        settingUp = true;
-        // resetSpinnerMaxMin();
-        setStartTime(s);
-        setPreviousStartTime(s);
-        setEndTime((null != e) ? e : s);
-        setPreviousEndTime(e);
-        endDateIsNullCheckbox.setSelected(null == e);
+        originalStartTime = Utils.dropFractionalSeconds(s);
+        originalEndTime = Utils.dropFractionalSeconds(e);
+
+        originalStartTime0 = Utils.getTimeOfDay(s);
+        startTimeModel.setValue(originalStartTime0);
+        logger.debug("set start time {} -> {}", s, originalStartTime0);
+
+        originalEndTime0 = Utils.getTimeOfDay(e);
+        endTimeModel.setValue(originalEndTime0);
+        logger.debug("set end time {} -> {}", e, originalEndTime0);
+
+        setPreviousStartTime(originalStartTime0);
+        setEndTime((null != originalEndTime0) ? originalEndTime0 : originalStartTime0);
+        setPreviousEndTime(originalEndTime0);
+
+        endDateIsNullCheckbox.setSelected(null == originalEndTime);
         updateEndSpinnerEnabled();
-        settingUp = false;
+
         resetStartSpinnerLimit("resetStart@setup");
         resetEndSpinnerLimit("resetEnd@setup");
 
@@ -123,35 +125,50 @@ public class WorksessionEditForm extends javax.swing.JDialog {
     }
 
     void resetStartSpinnerLimit(String s) {
-        if (!settingUp) {
-            logger.info("touched startTimeModel.setEnd");
-            startTimeModel.setEnd((Date) endSpinner.getValue());
-            logSpinners(s);
-        }
+        logger.debug("touched startTimeModel.setEnd");
+        startTimeModel.setEnd((Date) endSpinner.getValue());
+        logSpinners(s);
     }
 
     void resetEndSpinnerLimit(String s) {
-        if (!settingUp) {
-            logger.info("touched endTimeModel.setStart");
-            endTimeModel.setStart((Date) startSpinner.getValue());
-            logSpinners(s);
-        }
+        logger.debug("touched endTimeModel.setStart");
+        endTimeModel.setStart((Date) startSpinner.getValue());
+        logSpinners(s);
     }
 
     void logSpinners(String s) {
-        logger.info("logging spinners: {}", s);
-        logger.info("start spinner {} {} {} {}", diagDate(startTimeModel.getStart()), diagDate(startTimeModel.getDate()), diagDate(startSpinner.getValue()), diagDate(startTimeModel.getEnd()));
-        logger.info("  end spinner {} {} {} {}", diagDate(endTimeModel.getStart()), diagDate(endTimeModel.getDate()), diagDate(endSpinner.getValue()), diagDate(endTimeModel.getEnd()));
+        logger.debug("logging spinners: {}", s);
+        logger.debug("start spinner {} {} {} {}", diagDate(startTimeModel.getStart()), diagDate(startTimeModel.getDate()), diagDate(startSpinner.getValue()), diagDate(startTimeModel.getEnd()));
+        logger.debug("  end spinner {} {} {} {}", diagDate(endTimeModel.getStart()), diagDate(endTimeModel.getDate()), diagDate(endSpinner.getValue()), diagDate(endTimeModel.getEnd()));
+    }
+
+    public boolean isStartTimeChanged() {
+        return !originalStartTime0.equals(startTimeModel.getDate());
+    }
+
+    public boolean isEndTimeChanged() {
+        if (null == originalEndTime0) {
+            return ! endDateIsNullCheckbox.isSelected();
+        } else {
+            return !originalEndTime0.equals(endTimeModel.getDate());
+        }
     }
 
     public Date getStartTime() {
-        return startTimeModel.getDate();
+        Date rv = Utils.makeCompositeDate(originalStartTime, startTimeModel.getDate());
+        logger.info ("getStartTime = {}", rv);
+        return rv;
     }
 
     public Date getEndTime() {
-        return endTimeModel.getDate();
+        Date rv = null;
+        if (!endDateIsNullCheckbox.isSelected()) {
+            rv = Utils.makeCompositeDate(originalEndTime, endTimeModel.getDate());
+        }
+        logger.info ("getEndTime = {}", rv);
+        return rv;
     }
-
+    
     void updateEndSpinnerEnabled() {
         endSpinner.setEnabled(!endDateIsNullCheckbox.isSelected());
     }

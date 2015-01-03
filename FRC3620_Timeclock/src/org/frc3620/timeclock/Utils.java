@@ -1,12 +1,16 @@
 package org.frc3620.timeclock;
 
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author wegscd
  */
 public class Utils {
+
+    public static Logger logger = LoggerFactory.getLogger(Utils.class);
 
     static public Date getYesterday() {
         return getPreviousDay(getStartOfDay(new Date()));
@@ -39,19 +43,40 @@ public class Utils {
         calendar.set(Calendar.MILLISECOND, 999);
         return calendar.getTime();
     }
+
     static public Date getTimeOfDay(Date date) {
+        if (date == null) {
+            return null;
+        }
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
-        int h = calendar.get(Calendar.HOUR);
+        int h = calendar.get(Calendar.HOUR_OF_DAY);
         int m = calendar.get(Calendar.MINUTE);
         int s = calendar.get(Calendar.SECOND);
         int ms = calendar.get(Calendar.MILLISECOND);
         calendar.set(1970, Calendar.JANUARY, 1, h, m, s);
         calendar.set(Calendar.MILLISECOND, ms);
-        return calendar.getTime();
+        Date rv = calendar.getTime();
+        logger.info("getTimeOfDay {} -> {}", date, rv);
+        return rv;
     }
-    
-    static public Date dropFractionalSeconds (Date date) {
+
+    static public Date makeCompositeDate(Date day, Date time) {
+        Calendar dayCalendar = Calendar.getInstance();
+        Calendar timeCalendar = Calendar.getInstance();
+        dayCalendar.setTime(day);
+        timeCalendar.setTime(time);
+        dayCalendar.set(Calendar.HOUR_OF_DAY, timeCalendar.get(Calendar.HOUR_OF_DAY));
+        dayCalendar.set(Calendar.MINUTE, timeCalendar.get(Calendar.MINUTE));
+        dayCalendar.set(Calendar.SECOND, timeCalendar.get(Calendar.SECOND));
+        dayCalendar.clear(Calendar.MILLISECOND);
+        return dayCalendar.getTime();
+    }
+
+    static public Date dropFractionalSeconds(Date date) {
+        if (date == null) {
+            return null;
+        }
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         calendar.set(Calendar.MILLISECOND, 0);

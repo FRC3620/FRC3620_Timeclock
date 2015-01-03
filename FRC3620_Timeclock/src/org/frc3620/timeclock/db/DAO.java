@@ -21,19 +21,19 @@ public class DAO {
     BeanPropertyRowMapper<Person> personMapper = BeanPropertyRowMapper.newInstance(Person.class);
     BeanPropertyRowMapper<Worksession> worksessionMapper = BeanPropertyRowMapper
             .newInstance(Worksession.class);
-    
-    public void createWorksession (Person person) {
+
+    public void createWorksession(Person person) {
         Map<String, Object> args = new HashMap<>();
         args.put("person_id", person.getPersonId());
         args.put("start", new Date());
-        jdbcTemplate.update ("insert into SA.WORKSESSIONS (PERSON_ID, START_DATE, ORIGINAL_START_DATE) VALUES (:person_id, :start, :start)", args);
+        jdbcTemplate.update("insert into SA.WORKSESSIONS (PERSON_ID, START_DATE, ORIGINAL_START_DATE) VALUES (:person_id, :start, :start)", args);
     }
-    
-    public void closeWorksession (Worksession worksession) {
+
+    public void closeWorksession(Worksession worksession) {
         Map<String, Object> args = new HashMap<>();
         args.put("worksession_id", worksession.getWorksessionId());
         args.put("end", new Date());
-        jdbcTemplate.update ("update SA.WORKSESSIONS SET END_DATE = :end, ORIGINAL_END_DATE = :end WHERE WORKSESSION_ID = :worksession_id", args);
+        jdbcTemplate.update("update SA.WORKSESSIONS SET END_DATE = :end, ORIGINAL_END_DATE = :end WHERE WORKSESSION_ID = :worksession_id", args);
     }
 
     public Person fetchPerson(Integer id) {
@@ -80,8 +80,8 @@ public class DAO {
         logger.info("query: sql={} {}", sql, args);
 
         List<Worksession> rv = jdbcTemplate.query(sql.toString(), args, worksessionMapper);
-        
-        logger.info ("query: received {} rows", rv.size());
+
+        logger.info("query: received {} rows", rv.size());
         return rv;
     }
 
@@ -102,6 +102,44 @@ public class DAO {
         args.put("person_id", personId);
         String where = "person_id = :person_id";
         return fetchWorksessions(where, null, args);
+    }
+
+    public void updateStartTime(Worksession worksession, Date newDate, Person correctorPerson) {
+        {
+            Map<String, Object> args = new HashMap<>();
+            args.put("worksession_id", worksession.getWorksessionId());
+            args.put("newdate", newDate);
+            jdbcTemplate.update("update SA.WORKSESSIONS SET START_DATE = :newdate WHERE WORKSESSION_ID = :worksession_id", args);
+        }
+        {
+            Map<String, Object> args = new HashMap<>();
+            args.put("worksession_id", worksession.getWorksessionId());
+            args.put("new_date", newDate);
+            args.put("old_date", worksession.getStartDate());
+            args.put("correction_date", new Date());
+            args.put("corrected_by", correctorPerson.getPersonId());
+            jdbcTemplate.update("insert into SA.CORRECTIONS (WORKSESSION_ID, START_OR_END, NEW_DATE, OLD_DATE, CORRECTION_DATE, CORRECTED_BY) VALUES (:worksession_id, 'start', :new_date, :old_date, :correction_date, :corrected_by)", args);
+        }
+
+    }
+
+    public void updateEndTime(Worksession worksession, Date newDate, Person correctorPerson) {
+        {
+            Map<String, Object> args = new HashMap<>();
+            args.put("worksession_id", worksession.getWorksessionId());
+            args.put("newdate", newDate);
+            jdbcTemplate.update("update SA.WORKSESSIONS SET END_DATE = :newdate WHERE WORKSESSION_ID = :worksession_id", args);
+        }
+        {
+            Map<String, Object> args = new HashMap<>();
+            args.put("worksession_id", worksession.getWorksessionId());
+            args.put("new_date", newDate);
+            args.put("old_date", worksession.getEndDate());
+            args.put("correction_date", new Date());
+            args.put("corrected_by", correctorPerson.getPersonId());
+            jdbcTemplate.update("insert into SA.CORRECTIONS (WORKSESSION_ID, START_OR_END, NEW_DATE, OLD_DATE, CORRECTION_DATE, CORRECTED_BY) VALUES (:worksession_id, 'end', :new_date, :old_date, :correction_date, :corrected_by)", args);
+        }
+
     }
 
     <T> T justOne(List<T> l, String with) {

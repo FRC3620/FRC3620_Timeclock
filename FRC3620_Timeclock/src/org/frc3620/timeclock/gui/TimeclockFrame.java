@@ -61,7 +61,9 @@ public class TimeclockFrame extends javax.swing.JFrame {
         worksessionTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (!isMentorMode()) return;
+                if (!isMentorMode()) {
+                    return;
+                }
                 int r = worksessionTable.rowAtPoint(e.getPoint());
                 if (r >= 0 && r < worksessionTable.getRowCount()) {
                     worksessionTable.setRowSelectionInterval(r, r);
@@ -110,6 +112,10 @@ public class TimeclockFrame extends javax.swing.JFrame {
 
     public boolean isMentorMode() {
         return mentorModeMenuItem.isSelected();
+    }
+
+    public void setMentorModeMenuItemEnabled(boolean b) {
+        mentorModeMenuItem.setEnabled(b);
     }
 
     private boolean windowClosing = false;
@@ -180,6 +186,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
         worksessionTablePopupMenu.add(worksessionEditMenuItem);
 
         mentorModeMenuItem.setText("Mentor Mode");
+        mentorModeMenuItem.setEnabled(false);
         mentorModeMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 mentorModeMenuItemActionPerformed(evt);
@@ -294,9 +301,9 @@ public class TimeclockFrame extends javax.swing.JFrame {
         windowClosing = true;
     }//GEN-LAST:event_formWindowClosing
     private void worksessionEditMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_worksessionEditMenuItemActionPerformed
-        int p = personsTable.getSelectionModel().getLeadSelectionIndex();
-        int w = worksessionTable.getSelectionModel().getLeadSelectionIndex();
-        formEventListener.editWorksession(p, w);
+        int personIndex = personsTable.getSelectionModel().getLeadSelectionIndex();
+        int workstationIndex = worksessionTable.getSelectionModel().getLeadSelectionIndex();
+        formEventListener.editWorksession(personIndex, workstationIndex);
     }//GEN-LAST:event_worksessionEditMenuItemActionPerformed
 
     private void mentorModeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mentorModeMenuItemActionPerformed
@@ -316,14 +323,24 @@ public class TimeclockFrame extends javax.swing.JFrame {
                     pPnl.gainedFocus();
                 }
             });
-            
+
             dlg.setVisible(true);
-            if (op.getValue() != null && op.getValue().equals(JOptionPane.OK_OPTION)) {
-                String password = new String(pPnl.getPassword());
-                System.out.println("Your password is: " + password);
-                if (!"".equals(password)) {
+            logger.info("dialog getValue = {}  from {}", op.getValue(), op);
+            if (op.getValue() != null && op.getValue().equals(options[0])) {
+                logger.info("hit ok");
+                String enteredPassword = new String(pPnl.getPassword());
+                logger.info("password = {}", enteredPassword);
+                if (!"".equals(enteredPassword)) {
+                    logger.info("bad password");
                     mentorModeMenuItem.setSelected(false);
+                    formEventListener.mentorMode(null);
+                } else {
+                    logger.info("good password");
+                    formEventListener.mentorMode(personsTable.getSelectionModel().getLeadSelectionIndex());
                 }
+            } else {
+                logger.info("did not hit ok");
+                formEventListener.mentorMode(null);
             }
         }
     }//GEN-LAST:event_mentorModeMenuItemActionPerformed

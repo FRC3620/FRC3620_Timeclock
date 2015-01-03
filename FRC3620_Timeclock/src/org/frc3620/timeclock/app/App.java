@@ -24,9 +24,15 @@ import org.springframework.stereotype.Component;
 public class App implements FormEventListener {
 
     Logger logger = LoggerFactory.getLogger(getClass());
-    
+
     TimeclockFrame timeclockFrame;
     WorksessionEditForm worksessionEditForm;
+    private PersonsStatusTableModel personsStatusTableModel;
+    private WorksessionTableModel worksessionTableModel;
+
+    private DAO dao;
+
+    Person mentor = null;
 
     void go() {
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -45,12 +51,11 @@ public class App implements FormEventListener {
         }
         //</editor-fold>
 
-        //</editor-fold>
         personsStatusTableModel.reload();
 
-        timeclockFrame = new TimeclockFrame(personsStatusTableModel, worksessionTableModel,this);
+        timeclockFrame = new TimeclockFrame(personsStatusTableModel, worksessionTableModel, this);
         worksessionEditForm = new WorksessionEditForm(timeclockFrame, true);
-        
+
         final TimeclockFrame timeclockFrame2 = timeclockFrame;
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -89,22 +94,17 @@ public class App implements FormEventListener {
 
     }
 
-    private DAO dao;
-
     @Autowired
     public void setDao(DAO dao) {
         logger.info("{} set DAO to {}", this, dao);
         this.dao = dao;
     }
 
-    private PersonsStatusTableModel personsStatusTableModel;
-    private WorksessionTableModel worksessionTableModel;
-
     @Autowired
-    public void setPersonsStatusTableModel (PersonsStatusTableModel t) {
+    public void setPersonsStatusTableModel(PersonsStatusTableModel t) {
         this.personsStatusTableModel = t;
     }
-    
+
     @Autowired
     public void setWorksessionTableModel(WorksessionTableModel w) {
         this.worksessionTableModel = w;
@@ -115,9 +115,16 @@ public class App implements FormEventListener {
         Person person = personsStatusTableModel.getPersonAt(i);
         logger.info("selected {}: {}", i, person);
         updatePersonInfoOnScreen(person);
+        updateMentorMenuItem(person);
     }
-    
-    void updatePersonInfoOnScreen (Person person) {
+
+    void updateMentorMenuItem(Person person) {
+        if (!timeclockFrame.isMentorMode()) {
+            timeclockFrame.setMentorModeMenuItemEnabled(person.getMentor());
+        }
+    }
+
+    void updatePersonInfoOnScreen(Person person) {
         List<Worksession> worksessions = dao.fetchWorksessionsForPerson(person.getPersonId());
         timeclockFrame.setPersonNameText(person.getFirstname() + " " + person.getLastname());
         Worksession lastWorksession = (worksessions.size() > 0) ? worksessions.get(0) : null;
@@ -130,11 +137,12 @@ public class App implements FormEventListener {
         }
         worksessionTableModel.reload(person);
     }
+
     @Override
     public void checkin(Integer i) {
         Person person = personsStatusTableModel.getPersonAt(i);
         logger.info("checkin {}: {}", i, person);
-        dao.createWorksession (person);
+        dao.createWorksession(person);
         personsStatusTableModel.reload(person);
         personsStatusTableModel.fireTableRowsUpdated(i, i);
         updatePersonInfoOnScreen(person);
@@ -144,24 +152,41 @@ public class App implements FormEventListener {
     public void checkout(Integer i) {
         Person person = personsStatusTableModel.getPersonAt(i);
         logger.info("checkout {}: {}", i, person);
-        dao.closeWorksession (worksessionTableModel.getLastWorksession());
+        dao.closeWorksession(worksessionTableModel.getLastWorksession());
         personsStatusTableModel.reload(person);
         personsStatusTableModel.fireTableRowsUpdated(i, i);
         updatePersonInfoOnScreen(person);
     }
 
     @Override
-    public void editWorksession(Integer p, Integer w) {
-        Person person = personsStatusTableModel.getPersonAt(p);
-        Worksession worksession = worksessionTableModel.getWorksessionAt(w);
-        logger.info ("editing worksession @ {}: {}", w, worksession);
+    public void editWorksession(Integer personIndex, Integer workstationIndex) {
+        Person person = personsStatusTableModel.getPersonAt(personIndex);
+        Worksession worksession = worksessionTableModel.getWorksessionAt(workstationIndex);
+        logger.info("editing worksession @ {}: {}", workstationIndex, worksession);
         worksessionEditForm.setPersonTitle(person.getFirstname() + " " + person.getLastname());
         boolean okHit = worksessionEditForm.showDialog(worksession.getStartDate(), worksession.getEndDate());
         if (okHit) {
-            Date newStartTime = worksessionEditForm.getStartTime();
-            Date newEndTime = worksessionEditForm.getEndTime();
-            logger.info ("new start {}, end {}", newStartTime, newEndTime);
+            if (worksessionEditForm.isStartTimeChanged()) {
+                Date newStartTime = worksessionEditForm.getStartTime();
+                logger.info("new start time {}", newStartTime);
+                dao.updateStartTime(worksession, newStartTime, mentor);
+            }
+            if (worksessionEditForm.isEndTimeChanged()) {
+                Date newEndTime = worksessionEditForm.getEndTime();
+                logger.info("new end time {}", newEndTime);
+                dao.updateEndTime(worksession, newEndTime, mentor);
+            }
         }
+    }
+
+    @Override
+    public void mentorMode(Integer personIndex) {
+        if (null == personIndex) {
+            mentor = null;
+        } else {
+            mentor = personsStatusTableModel.getPersonAt(personIndex);
+        }
+        logger.info ("mentor index is {}, {}", personIndex, mentor);
     }
 
 }
