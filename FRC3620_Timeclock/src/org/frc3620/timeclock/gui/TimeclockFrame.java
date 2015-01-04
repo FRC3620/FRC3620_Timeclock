@@ -6,6 +6,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -118,39 +120,30 @@ public class TimeclockFrame extends javax.swing.JFrame {
     public void setMentorModeMenuItemEnabled(boolean b) {
         mentorModeMenuItem.setEnabled(b);
     }
+    
+    final SimpleDateFormat statusSdf = new SimpleDateFormat ("EEEE MMM dd, yyyy hh:mm:ss a");
+    public void setStatus (String s) {
+        if ("".equals(s) || null == s) {
+            statusLabel.setText("");
+        } else {
+            statusLabel.setText (statusSdf.format(new Date()) + " " + s);
+        }
+        statusLabel.paintImmediately(statusLabel.getVisibleRect());
+    }
+    public void setSubstatus (String s) {
+        if ("".equals(s) || null == s) {
+            substatusLabel.setText("");
+        } else {
+            substatusLabel.setText (statusSdf.format(new Date()) + " " + s);
+        }
+        substatusLabel.paintImmediately(substatusLabel.getVisibleRect());
+ 
+    }
 
     private boolean windowClosing = false;
 
     public boolean isWindowClosing() {
         return windowClosing;
-    }
-
-    class PasswordPanel extends JPanel {
-
-        private final JPasswordField passwordField = new JPasswordField(12);
-        private boolean gainedFocusBefore;
-
-        /**
-         * "Hook" method that causes the JPasswordField to request focus the
-         * first time this method is called.
-         */
-        void gainedFocus() {
-            if (!gainedFocusBefore) {
-                gainedFocusBefore = true;
-                passwordField.requestFocusInWindow();
-            }
-        }
-
-        public PasswordPanel() {
-            super(new FlowLayout());
-
-            add(new JLabel("Password: "));
-            add(passwordField);
-        }
-
-        public char[] getPassword() {
-            return passwordField.getPassword();
-        }
     }
 
     /**
@@ -164,6 +157,9 @@ public class TimeclockFrame extends javax.swing.JFrame {
 
         worksessionTablePopupMenu = new javax.swing.JPopupMenu();
         worksessionEditMenuItem = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        worksessionAddMenuItem = new javax.swing.JMenuItem();
+        worksessionRemoveMenuItem = new javax.swing.JMenuItem();
         mentorModeMenuItem = new javax.swing.JCheckBoxMenuItem();
         currentTime = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
@@ -177,6 +173,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
         worksessionTable = new javax.swing.JTable();
         jPanel3 = new javax.swing.JPanel();
         statusLabel = new javax.swing.JLabel();
+        substatusLabel = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
 
         worksessionTablePopupMenu.setLabel("Worksession Context Menu");
@@ -188,6 +185,23 @@ public class TimeclockFrame extends javax.swing.JFrame {
             }
         });
         worksessionTablePopupMenu.add(worksessionEditMenuItem);
+        worksessionTablePopupMenu.add(jSeparator1);
+
+        worksessionAddMenuItem.setText("Add worksession");
+        worksessionAddMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                worksessionAddMenuItemActionPerformed(evt);
+            }
+        });
+        worksessionTablePopupMenu.add(worksessionAddMenuItem);
+
+        worksessionRemoveMenuItem.setText("Remove worksession");
+        worksessionRemoveMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                worksessionRemoveMenuItemActionPerformed(evt);
+            }
+        });
+        worksessionTablePopupMenu.add(worksessionRemoveMenuItem);
 
         mentorModeMenuItem.setText("Mentor Mode");
         mentorModeMenuItem.setEnabled(false);
@@ -198,6 +212,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
         });
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Average Joes 3620 Timeclock");
         setPreferredSize(new java.awt.Dimension(810, 456));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -258,7 +273,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
                     .addComponent(checkinButton)
                     .addComponent(checkoutButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -276,22 +291,14 @@ public class TimeclockFrame extends javax.swing.JFrame {
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         jPanel3.setMinimumSize(new java.awt.Dimension(0, 24));
         jPanel3.setPreferredSize(new java.awt.Dimension(0, 24));
+        jPanel3.setLayout(new org.jdesktop.swingx.VerticalLayout());
 
-        statusLabel.setText("jLabel1");
-
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(statusLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 20, Short.MAX_VALUE)
-        );
+        statusLabel.setText(" ");
+        jPanel3.add(statusLabel);
+        jPanel3.add(substatusLabel);
 
         setJMenuBar(jMenuBar1);
 
@@ -299,7 +306,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 810, Short.MAX_VALUE)
+            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(currentTime, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -310,7 +317,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
@@ -345,39 +352,10 @@ public class TimeclockFrame extends javax.swing.JFrame {
     private void mentorModeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mentorModeMenuItemActionPerformed
         logger.debug("mentorModeMenuItem, selected {}, evt {}", mentorModeMenuItem.isSelected(), evt);
         if (mentorModeMenuItem.isSelected()) {
-            final PasswordPanel pPnl = new PasswordPanel();
-            String[] options = new String[]{"OK", "Cancel"};
-            JOptionPane op = new JOptionPane(pPnl, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
-                    null, options, options[0]);
-
-            JDialog dlg = op.createDialog("Who Goes There?");
-
-            // Wire up FocusListener to ensure JPasswordField is able to request focus when the dialog is first shown.
-            dlg.addWindowFocusListener(new WindowAdapter() {
-                @Override
-                public void windowGainedFocus(WindowEvent e) {
-                    pPnl.gainedFocus();
-                }
-            });
-
-            dlg.setVisible(true);
-            logger.debug("dialog getValue = {} from {}", op.getValue(), op);
-            if (op.getValue() != null && op.getValue().equals(options[0])) {
-                logger.debug("hit ok");
-                String enteredPassword = new String(pPnl.getPassword());
-                logger.debug("password = {}", enteredPassword);
-                if (!"".equals(enteredPassword)) {
-                    logger.debug("bad password");
-                    mentorModeMenuItem.setSelected(false);
-                    formEventListener.mentorMode(null);
-                } else {
-                    logger.debug("good password");
-                    formEventListener.mentorMode(personsTable.getSelectionModel().getLeadSelectionIndex());
-                }
-            } else {
-                logger.debug("did not hit ok");
-                formEventListener.mentorMode(null);
-            }
+            boolean okToSet = formEventListener.tryToSetMentorMode(personsTable.getSelectionModel().getLeadSelectionIndex());
+            if (!okToSet) mentorModeMenuItem.setSelected(false);
+        } else {
+            formEventListener.clearMentorMode();
         }
         if (mentorModeMenuItem.isSelected()) {
             mentorModeMenuItem.setForeground(Color.red);
@@ -385,6 +363,17 @@ public class TimeclockFrame extends javax.swing.JFrame {
             mentorModeMenuItem.setForeground(Color.black);
         }
     }//GEN-LAST:event_mentorModeMenuItemActionPerformed
+
+    private void worksessionRemoveMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_worksessionRemoveMenuItemActionPerformed
+        int personIndex = personsTable.getSelectionModel().getLeadSelectionIndex();
+        int workstationIndex = worksessionTable.getSelectionModel().getLeadSelectionIndex();
+        formEventListener.removeWorksession(personIndex, workstationIndex);
+    }//GEN-LAST:event_worksessionRemoveMenuItemActionPerformed
+
+    private void worksessionAddMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_worksessionAddMenuItemActionPerformed
+        int personIndex = personsTable.getSelectionModel().getLeadSelectionIndex();
+        formEventListener.addWorksession(personIndex);
+    }//GEN-LAST:event_worksessionAddMenuItemActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton checkinButton;
@@ -396,11 +385,15 @@ public class TimeclockFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JCheckBoxMenuItem mentorModeMenuItem;
     private javax.swing.JLabel personNameLabel;
     private javax.swing.JTable personsTable;
     private javax.swing.JLabel statusLabel;
+    private javax.swing.JLabel substatusLabel;
+    private javax.swing.JMenuItem worksessionAddMenuItem;
     private javax.swing.JMenuItem worksessionEditMenuItem;
+    private javax.swing.JMenuItem worksessionRemoveMenuItem;
     private javax.swing.JTable worksessionTable;
     private javax.swing.JPopupMenu worksessionTablePopupMenu;
     // End of variables declaration//GEN-END:variables

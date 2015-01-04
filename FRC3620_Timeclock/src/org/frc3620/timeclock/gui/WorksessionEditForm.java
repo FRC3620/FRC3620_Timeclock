@@ -16,8 +16,9 @@ public class WorksessionEditForm extends javax.swing.JDialog {
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
-    static final String DATE_FORMAT = "hh:mm:ss a";
-    final SimpleDateFormat sdt = new SimpleDateFormat(DATE_FORMAT);
+    static final String TIME_FORMAT = "h:mm:ss a";
+    final SimpleDateFormat sdt = new SimpleDateFormat(TIME_FORMAT);
+    final SimpleDateFormat dsdt = new SimpleDateFormat("EEEE MMMM dd, yyyy");
 
     Date originalStartTime, originalEndTime, originalStartTime0, originalEndTime0;
     SpinnerDateModel startTimeModel, endTimeModel;
@@ -94,6 +95,10 @@ public class WorksessionEditForm extends javax.swing.JDialog {
     public boolean showDialog(Date s, Date e) {
         originalStartTime = Utils.dropFractionalSeconds(s);
         originalEndTime = Utils.dropFractionalSeconds(e);
+       
+        synchronized (dsdt) {
+            dateLabel.setText (dsdt.format(s));
+        }
 
         originalStartTime0 = Utils.getTimeOfDay(originalStartTime);
         logger.debug("set start time {} -> {}", s, originalStartTime0);
@@ -196,70 +201,98 @@ public class WorksessionEditForm extends javax.swing.JDialog {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
-        jButton3 = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        startSpinner = new javax.swing.JSpinner();
-        endSpinner = new javax.swing.JSpinner();
-        previousStartTimeLabel = new javax.swing.JLabel();
-        previousEndTimeLabel = new javax.swing.JLabel();
         titleLabel = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        dateLabel = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        startSpinner = new javax.swing.JSpinner();
+        jLabel2 = new javax.swing.JLabel();
+        previousStartTimeLabel = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        endSpinner = new javax.swing.JSpinner();
+        endDateIsNullCheckbox = new javax.swing.JCheckBox();
+        jLabel4 = new javax.swing.JLabel();
+        previousEndTimeLabel = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
         okButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
-        endDateIsNullCheckbox = new javax.swing.JCheckBox();
-
-        jButton3.setText("jButton3");
 
         setTitle("Edit Worksession");
-
-        jLabel1.setText("Start Time");
-
-        jLabel2.setText("Previous Start Time");
-
-        jLabel3.setText("End Time");
-
-        jLabel4.setText("Previous End Time");
-
-        startSpinner.setModel(new javax.swing.SpinnerDateModel(new java.util.Date(), null, null, java.util.Calendar.SECOND));
-        startSpinner.setEditor(new javax.swing.JSpinner.DateEditor(startSpinner, "h:mm:ss a"));
-        startSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                startSpinnerStateChanged(evt);
-            }
-        });
-
-        endSpinner.setModel(new javax.swing.SpinnerDateModel(new java.util.Date(), null, null, java.util.Calendar.SECOND));
-        endSpinner.setEditor(new javax.swing.JSpinner.DateEditor(endSpinner, "h:mm:ss a"));
-        endSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                endSpinnerStateChanged(evt);
-            }
-        });
-
-        previousStartTimeLabel.setText("s");
-
-        previousEndTimeLabel.setText("e");
 
         titleLabel.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         titleLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         titleLabel.setText("Title");
 
-        okButton.setText("OK");
-        okButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                okButtonActionPerformed(evt);
-            }
-        });
+        java.awt.GridBagLayout jPanel1Layout = new java.awt.GridBagLayout();
+        jPanel1Layout.columnWidths = new int[] {0, 5, 0, 5, 0};
+        jPanel1Layout.rowHeights = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0};
+        jPanel1.setLayout(jPanel1Layout);
 
-        cancelButton.setText("Cancel");
-        cancelButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cancelButtonActionPerformed(evt);
+        dateLabel.setText("dateLabel");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 5;
+        jPanel1.add(dateLabel, gridBagConstraints);
+
+        jLabel1.setText("Start Time");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        jPanel1.add(jLabel1, gridBagConstraints);
+
+        startSpinner.setModel(new javax.swing.SpinnerDateModel(new java.util.Date(), null, null, java.util.Calendar.SECOND));
+        startSpinner.setEditor(new javax.swing.JSpinner.DateEditor(startSpinner, "h:mm:ss a"));
+        startSpinner.setMinimumSize(new java.awt.Dimension(100, 30));
+        startSpinner.setPreferredSize(new java.awt.Dimension(100, 30));
+        startSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                startSpinnerStateChanged(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+        jPanel1.add(startSpinner, gridBagConstraints);
+
+        jLabel2.setText("Previous Start Time");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        jPanel1.add(jLabel2, gridBagConstraints);
+
+        previousStartTimeLabel.setText("s");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 0);
+        jPanel1.add(previousStartTimeLabel, gridBagConstraints);
+
+        jLabel3.setText("End Time");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        jPanel1.add(jLabel3, gridBagConstraints);
+
+        endSpinner.setModel(new javax.swing.SpinnerDateModel(new java.util.Date(), null, null, java.util.Calendar.SECOND));
+        endSpinner.setEditor(new javax.swing.JSpinner.DateEditor(endSpinner, "h:mm:ss a"));
+        endSpinner.setMinimumSize(new java.awt.Dimension(100, 30));
+        endSpinner.setPreferredSize(new java.awt.Dimension(100, 30));
+        endSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                endSpinnerStateChanged(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 6;
+        jPanel1.add(endSpinner, gridBagConstraints);
 
         endDateIsNullCheckbox.setText("blank");
         endDateIsNullCheckbox.addActionListener(new java.awt.event.ActionListener() {
@@ -267,71 +300,59 @@ public class WorksessionEditForm extends javax.swing.JDialog {
                 endDateIsNullCheckboxActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        jPanel1.add(endDateIsNullCheckbox, gridBagConstraints);
+
+        jLabel4.setText("Previous End Time");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        jPanel1.add(jLabel4, gridBagConstraints);
+
+        previousEndTimeLabel.setText("e");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 0);
+        jPanel1.add(previousEndTimeLabel, gridBagConstraints);
+
+        okButton.setText("OK");
+        okButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                okButtonActionPerformed(evt);
+            }
+        });
+        jPanel2.add(okButton);
+
+        cancelButton.setText("Cancel");
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
+        jPanel2.add(cancelButton);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(titleLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel1))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(previousStartTimeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(startSpinner)
-                                .addContainerGap())))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jLabel3))
-                                .addGap(24, 24, 24)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(previousEndTimeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(endSpinner))
-                                .addGap(5, 5, 5)
-                                .addComponent(endDateIsNullCheckbox))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(okButton)
-                                .addGap(18, 18, 18)
-                                .addComponent(cancelButton)))
-                        .addGap(0, 0, Short.MAX_VALUE))))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(titleLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addComponent(titleLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(startSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addComponent(previousStartTimeLabel))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel3)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(endSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(endDateIsNullCheckbox)))
-                .addGap(20, 20, 20)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(previousEndTimeLabel))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(okButton)
-                    .addComponent(cancelButton))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(0, 0, 0)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
@@ -369,13 +390,15 @@ public class WorksessionEditForm extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
+    private javax.swing.JLabel dateLabel;
     private javax.swing.JCheckBox endDateIsNullCheckbox;
     private javax.swing.JSpinner endSpinner;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JButton okButton;
     private javax.swing.JLabel previousEndTimeLabel;
     private javax.swing.JLabel previousStartTimeLabel;

@@ -1,15 +1,21 @@
 package org.frc3620.timeclock.app;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import org.frc3620.timeclock.Person;
 import org.frc3620.timeclock.Utils;
 import org.frc3620.timeclock.Worksession;
 import org.frc3620.timeclock.db.DAO;
 import org.frc3620.timeclock.gui.FormEventListener;
+import org.frc3620.timeclock.gui.PasswordPanel;
 import org.frc3620.timeclock.gui.PersonsStatusTableModel;
 import org.frc3620.timeclock.gui.TimeclockFrame;
+import org.frc3620.timeclock.gui.WorksessionAddForm;
 import org.frc3620.timeclock.gui.WorksessionEditForm;
 import org.frc3620.timeclock.gui.WorksessionTableModel;
 import org.slf4j.Logger;
@@ -28,6 +34,7 @@ public class App implements FormEventListener {
 
     TimeclockFrame timeclockFrame;
     WorksessionEditForm worksessionEditForm;
+    WorksessionAddForm worksessionAddForm;
     private PersonsStatusTableModel personsStatusTableModel;
     private WorksessionTableModel worksessionTableModel;
 
@@ -56,6 +63,7 @@ public class App implements FormEventListener {
 
         timeclockFrame = new TimeclockFrame(personsStatusTableModel, worksessionTableModel, this);
         worksessionEditForm = new WorksessionEditForm(timeclockFrame, true);
+        worksessionAddForm = new WorksessionAddForm(timeclockFrame, true);
 
         final TimeclockFrame timeclockFrame2 = timeclockFrame;
         /* Create and display the form */
@@ -80,7 +88,7 @@ public class App implements FormEventListener {
             }
 
             Date now = new Date();
-            
+
             final String formattedTime = sdt.format(new Date());
             if (!formattedTime.equals(previousFormattedTime)) {
                 java.awt.EventQueue.invokeLater(new Runnable() {
@@ -92,11 +100,11 @@ public class App implements FormEventListener {
             }
 
             Date beginningOfDay = Utils.getStartOfDay(now);
-            logger.info ("doing date compare {}, {}", beginningOfDay, previousBeginningOfDay);
+            logger.debug("doing date compare {}, {}", beginningOfDay, previousBeginningOfDay);
             if (!beginningOfDay.equals(previousBeginningOfDay)) {
                 // it's a new day, so rework the left hand pane to reset
                 // all the IN/OUT markers.
-                logger.info ("reloading!");
+                logger.info("new day, reloading!");
                 java.awt.EventQueue.invokeLater(new Runnable() {
                     public void run() {
                         personsStatusTableModel.reload();
@@ -142,9 +150,20 @@ public class App implements FormEventListener {
         }
     }
 
+    void updatePersonStatus(Person person, Integer personIndex) {
+        timeclockFrame.setStatus("refreshing status for " + person.getName());
+        personsStatusTableModel.reload(person);
+        personsStatusTableModel.fireTableRowsUpdated(personIndex, personIndex);
+        timeclockFrame.setStatus("getting updated worksessions for " + person.getName());
+        updatePersonInfoOnScreen(person);
+        timeclockFrame.setStatus(null);
+    }
+
     void updatePersonInfoOnScreen(Person person) {
+        timeclockFrame.setSubstatus("fetching worksessions for " + person.getName());
         List<Worksession> worksessions = dao.fetchWorksessionsForPerson(person.getPersonId());
-        timeclockFrame.setPersonNameText(person.getFirstname() + " " + person.getLastname());
+        timeclockFrame.setSubstatus(null);
+        timeclockFrame.setPersonNameText(person.getName());
         Worksession lastWorksession = (worksessions.size() > 0) ? worksessions.get(0) : null;
         if (lastWorksession != null && lastWorksession.isToday() && lastWorksession.getEndDate() == null) {
             timeclockFrame.setCheckInButtonEnabled(false);
@@ -157,23 +176,21 @@ public class App implements FormEventListener {
     }
 
     @Override
-    public void checkin(Integer i) {
-        Person person = personsStatusTableModel.getPersonAt(i);
-        logger.info("checkin {}: {}", i, person);
+    public void checkin(Integer personIndex) {
+        Person person = personsStatusTableModel.getPersonAt(personIndex);
+        logger.info("checkin {}: {}", personIndex, person);
         dao.createWorksession(person);
-        personsStatusTableModel.reload(person);
-        personsStatusTableModel.fireTableRowsUpdated(i, i);
-        updatePersonInfoOnScreen(person);
+
+        updatePersonStatus(person, personIndex);
     }
 
     @Override
-    public void checkout(Integer i) {
-        Person person = personsStatusTableModel.getPersonAt(i);
-        logger.info("checkout {}: {}", i, person);
+    public void checkout(Integer personIndex) {
+        Person person = personsStatusTableModel.getPersonAt(personIndex);
+        logger.info("checkout {}: {}", personIndex, person);
         dao.closeWorksession(worksessionTableModel.getLastWorksession());
-        personsStatusTableModel.reload(person);
-        personsStatusTableModel.fireTableRowsUpdated(i, i);
-        updatePersonInfoOnScreen(person);
+
+        updatePersonStatus(person, personIndex);
     }
 
     @Override
@@ -181,7 +198,7 @@ public class App implements FormEventListener {
         Person person = personsStatusTableModel.getPersonAt(personIndex);
         Worksession worksession = worksessionTableModel.getWorksessionAt(workstationIndex);
         logger.info("editing worksession @ {}: {}", workstationIndex, worksession);
-        worksessionEditForm.setPersonTitle(person.getFirstname() + " " + person.getLastname());
+        worksessionEditForm.setPersonTitle(person.getName());
         boolean okHit = worksessionEditForm.showDialog(worksession.getStartDate(), worksession.getEndDate());
         if (okHit) {
             if (worksessionEditForm.isStartTimeChanged()) {
@@ -195,20 +212,87 @@ public class App implements FormEventListener {
                 dao.updateEndTime(worksession, newEndTime, mentor);
             }
         }
-        personsStatusTableModel.reload(person);
-        personsStatusTableModel.fireTableRowsUpdated(personIndex, personIndex);
-        updatePersonInfoOnScreen(person);
 
+        updatePersonStatus(person, personIndex);
     }
 
     @Override
-    public void mentorMode(Integer personIndex) {
-        if (null == personIndex) {
-            mentor = null;
-        } else {
-            mentor = personsStatusTableModel.getPersonAt(personIndex);
+    public void removeWorksession(Integer personIndex, Integer workstationIndex) {
+        Person person = personsStatusTableModel.getPersonAt(personIndex);
+        Worksession worksession = worksessionTableModel.getWorksessionAt(workstationIndex);
+        logger.info("removing worksession @ {}: {}", workstationIndex, worksession);
+
+        //Custom button text
+        Object[] options = {"Yes",
+            "No"};
+        int reply = JOptionPane.showOptionDialog(timeclockFrame, "Are you sure you want to remove this worksession?",
+                "Remove worksession",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE,
+                null, options, options[1]);
+        if (0 == reply) {
+            reply = JOptionPane.showOptionDialog(timeclockFrame, "Are you DARN sure you want to remove this worksession?",
+                    "Remove worksession",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE,
+                    null, options, options[1]);
         }
-        logger.info("mentor index is {}, {}", personIndex, mentor);
+        if (0 == reply) {
+            dao.removeWorksession(worksession, mentor);
+        }
+
+        updatePersonStatus(person, personIndex);
+    }
+
+    @Override
+    public void clearMentorMode() {
+        mentor = null;
+        logger.info ("mentor mode cleared");
+    }
+
+    @Override
+    public boolean tryToSetMentorMode(Integer personIndex) {
+        boolean rv = false;
+
+        final PasswordPanel pPnl = new PasswordPanel();
+        String[] options = new String[]{"OK", "Cancel"};
+        JOptionPane op = new JOptionPane(pPnl, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
+                null, options, options[0]);
+
+        JDialog dlg = op.createDialog(timeclockFrame, "Who Goes There?");
+
+        // Wire up FocusListener to ensure JPasswordField is able to request focus when the dialog is first shown.
+        dlg.addWindowFocusListener(new WindowAdapter() {
+            @Override
+            public void windowGainedFocus(WindowEvent e) {
+                pPnl.gainedFocus();
+            }
+        });
+
+        dlg.setVisible(true);
+        logger.debug("dialog getValue = {} from {}", op.getValue(), op);
+        if (op.getValue() != null && op.getValue().equals(options[0])) {
+            logger.debug("hit ok");
+            String enteredPassword = new String(pPnl.getPassword());
+            logger.debug("password = {}", enteredPassword);
+            rv = ("".equals(enteredPassword));
+            if (rv) {
+                mentor = personsStatusTableModel.getPersonAt(personIndex);
+                logger.info ("mentor mode set: {}", mentor.getName());
+            }
+        }
+        return rv;
+    }
+
+    @Override
+    public void addWorksession(Integer personIndex) {
+        Person person = personsStatusTableModel.getPersonAt(personIndex);
+        worksessionAddForm.setPersonTitle(person.getName());
+        boolean okHit = worksessionAddForm.showDialog();
+        if (okHit) {
+        }
+
+        updatePersonStatus(person, personIndex);
     }
 
 }

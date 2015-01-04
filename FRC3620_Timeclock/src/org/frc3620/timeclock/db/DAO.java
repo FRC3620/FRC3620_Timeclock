@@ -66,9 +66,9 @@ public class DAO {
 
     public List<Worksession> fetchWorksessions(String where, String post, Map<String, Object> args) {
         StringBuilder sql = new StringBuilder();
-        sql.append("select * from SA.WORKSESSIONS ");
+        sql.append("select * from SA.WORKSESSIONS where REMOVED = FALSE ");
         if (where != null && where.length() > 0) {
-            sql.append("where ");
+            sql.append("and ");
             sql.append(where);
             sql.append(" ");
         }
@@ -140,6 +140,22 @@ public class DAO {
             jdbcTemplate.update("insert into SA.CORRECTIONS (WORKSESSION_ID, START_OR_END, NEW_DATE, OLD_DATE, CORRECTION_DATE, CORRECTED_BY) VALUES (:worksession_id, 'end', :new_date, :old_date, :correction_date, :corrected_by)", args);
         }
 
+    }
+
+    public void removeWorksession(Worksession worksession, Person correctorPerson) {
+        {
+            Map<String, Object> args = new HashMap<>();
+            args.put("worksession_id", worksession.getWorksessionId());
+            args.put("removed_by", correctorPerson.getPersonId());
+            jdbcTemplate.update("update SA.WORKSESSIONS set REMOVED = true, REMOVED_BY = :removed_by where WORKSESSION_ID = :worksession_id", args);
+        }
+        {
+            Map<String, Object> args = new HashMap<>();
+            args.put("worksession_id", worksession.getWorksessionId());
+            args.put("correction_date", new Date());
+            args.put("corrected_by", correctorPerson.getPersonId());
+            jdbcTemplate.update("insert into SA.CORRECTIONS (WORKSESSION_ID, START_OR_END, CORRECTION_DATE, CORRECTED_BY) VALUES (:worksession_id, 'remove', :correction_date, :corrected_by)", args);
+        }
     }
 
     <T> T justOne(List<T> l, String with) {

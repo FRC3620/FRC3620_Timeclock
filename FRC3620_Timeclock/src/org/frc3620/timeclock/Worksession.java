@@ -14,6 +14,7 @@ import java.util.Date;
 public class Worksession {
     private Integer worksessionId, personId;
     private Date startDate, originalStartDate, endDate, originalEndDate;
+    private boolean removed;
 
     public Integer getWorksessionId() {
         return worksessionId;
@@ -65,6 +66,14 @@ public class Worksession {
     
     public boolean isToday() {
         return Utils.getStartOfDay(new Date()).before(startDate);
+    }
+
+    public boolean isRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(boolean removed) {
+        this.removed = removed;
     }
 
     @Override

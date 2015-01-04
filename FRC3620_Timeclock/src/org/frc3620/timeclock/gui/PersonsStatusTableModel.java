@@ -56,8 +56,8 @@ public class PersonsStatusTableModel extends AbstractTableModel {
     public void reload (Person p) {
         for (int i = 0; i < personsStatus.size(); i++) {
             if (personsStatus.get(i).getPerson().getPersonId().equals(p.getPersonId())) {
-                Person p1 = dao.fetchPerson(p.getPersonId());
-                CurrentStatus c = new CurrentStatus(p1);
+                // Person p1 = dao.fetchPerson(p.getPersonId());
+                CurrentStatus c = new CurrentStatus(p);
                 personsStatus.set(i, c);
                 return;
             }
@@ -173,7 +173,7 @@ public class PersonsStatusTableModel extends AbstractTableModel {
         }
 
         public String getName() {
-            return person.getLastname() + ", " + person.getFirstname();
+            return person.getLastName() + ", " + person.getFirstName();
         }
 
         public Where getWhere() {
