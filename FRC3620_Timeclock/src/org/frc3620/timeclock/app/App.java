@@ -92,9 +92,11 @@ public class App implements FormEventListener {
             }
 
             Date beginningOfDay = Utils.getStartOfDay(now);
+            logger.info ("doing date compare {}, {}", beginningOfDay, previousBeginningOfDay);
             if (!beginningOfDay.equals(previousBeginningOfDay)) {
                 // it's a new day, so rework the left hand pane to reset
                 // all the IN/OUT markers.
+                logger.info ("reloading!");
                 java.awt.EventQueue.invokeLater(new Runnable() {
                     public void run() {
                         personsStatusTableModel.reload();
