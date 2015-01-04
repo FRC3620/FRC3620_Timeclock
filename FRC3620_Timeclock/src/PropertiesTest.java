@@ -49,6 +49,7 @@ public class PropertiesTest
         {
             String name = (String) names.nextElement();
             propsMap.put("${" + name + "}", props.getProperty(name));
+            System.out.println(name + " -> " + props.getProperty(name));
         }
         return propsMap;
     }

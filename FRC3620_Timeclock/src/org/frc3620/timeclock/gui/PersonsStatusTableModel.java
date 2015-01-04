@@ -24,11 +24,11 @@ public class PersonsStatusTableModel extends AbstractTableModel {
     Logger logger = LoggerFactory.getLogger(getClass());
     List<CurrentStatus> personsStatus = new ArrayList<>();
 
-    SimpleDateFormat sdt = new SimpleDateFormat("HH:mm:ss");
+    final SimpleDateFormat sdt = new SimpleDateFormat("hh:mm:ss a");
 
     public TableColumnModel getTableColumnModel() {
         TableColumnModel rv = new DefaultTableColumnModel();
-        rv.addColumn(new TableColumn(0, 200));
+        rv.addColumn(new TableColumn(0, 180));
         rv.getColumn(0).setHeaderValue("Name");
         rv.addColumn(new TableColumn(1, 80));
         rv.getColumn(1).setHeaderValue("Status");
@@ -108,7 +108,7 @@ public class PersonsStatusTableModel extends AbstractTableModel {
                 o = s.getName();
                 break;
             case 1:
-                o = s.getWhere();
+                o = s.getWhere().getLabel();
                 break;
             case 2:
                 if (s.getWhen() == null) {
@@ -201,7 +201,18 @@ public class PersonsStatusTableModel extends AbstractTableModel {
 
     enum Where {
 
-        UNKNOWN(), IN(), OUT();
+        UNKNOWN(""), IN("In"), OUT("Out");
+        
+        String label;
+        
+        Where (String _label) {
+            label = _label;
+        }
+        
+        public String getLabel() {
+            return label;
+        }
+        
     }
     
 }

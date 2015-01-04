@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import org.frc3620.timeclock.Person;
+import org.frc3620.timeclock.Utils;
 import org.frc3620.timeclock.Worksession;
 import org.frc3620.timeclock.db.DAO;
 import org.frc3620.timeclock.gui.FormEventListener;
@@ -64,8 +65,9 @@ public class App implements FormEventListener {
             }
         });
 
-        String time = null;
-        SimpleDateFormat sdt = new SimpleDateFormat("HH:mm:ss");
+        String previousFormattedTime = null;
+        Date previousBeginningOfDay = null;
+        SimpleDateFormat sdt = new SimpleDateFormat("hh:mm:ss a");
         while (true) {
             boolean windowClosed = timeclockFrame.isWindowClosing();
             // logger.info ("timeClockFrame closed = {}", windowClosed);
@@ -77,14 +79,28 @@ public class App implements FormEventListener {
             } catch (InterruptedException ex) {
             }
 
-            final String newTime = sdt.format(new Date());
-            if (!newTime.equals(time)) {
+            Date now = new Date();
+            
+            final String formattedTime = sdt.format(new Date());
+            if (!formattedTime.equals(previousFormattedTime)) {
                 java.awt.EventQueue.invokeLater(new Runnable() {
                     public void run() {
-                        timeclockFrame.setTimeText(newTime);
+                        timeclockFrame.setTimeText(formattedTime);
                     }
                 });
-                time = newTime;
+                previousFormattedTime = formattedTime;
+            }
+
+            Date beginningOfDay = Utils.getStartOfDay(now);
+            if (!beginningOfDay.equals(previousBeginningOfDay)) {
+                // it's a new day, so rework the left hand pane to reset
+                // all the IN/OUT markers.
+                java.awt.EventQueue.invokeLater(new Runnable() {
+                    public void run() {
+                        personsStatusTableModel.reload();
+                    }
+                });
+                previousBeginningOfDay = beginningOfDay;
             }
         }
 

@@ -326,21 +326,21 @@ public class TimeclockFrame extends javax.swing.JFrame {
             });
 
             dlg.setVisible(true);
-            logger.info("dialog getValue = {}  from {}", op.getValue(), op);
+            logger.debug("dialog getValue = {} from {}", op.getValue(), op);
             if (op.getValue() != null && op.getValue().equals(options[0])) {
-                logger.info("hit ok");
+                logger.debug("hit ok");
                 String enteredPassword = new String(pPnl.getPassword());
-                logger.info("password = {}", enteredPassword);
+                logger.debug("password = {}", enteredPassword);
                 if (!"".equals(enteredPassword)) {
-                    logger.info("bad password");
+                    logger.debug("bad password");
                     mentorModeMenuItem.setSelected(false);
                     formEventListener.mentorMode(null);
                 } else {
-                    logger.info("good password");
+                    logger.debug("good password");
                     formEventListener.mentorMode(personsTable.getSelectionModel().getLeadSelectionIndex());
                 }
             } else {
-                logger.info("did not hit ok");
+                logger.debug("did not hit ok");
                 formEventListener.mentorMode(null);
             }
         }

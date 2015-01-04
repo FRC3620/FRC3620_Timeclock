@@ -23,16 +23,16 @@ public class WorksessionTableModel extends AbstractTableModel {
     Logger logger = LoggerFactory.getLogger(getClass());
     List<Worksession> worksessions = new ArrayList<>();
 
-    SimpleDateFormat hhmmssFormat = new SimpleDateFormat("HH:mm:ss");
-    SimpleDateFormat dayFormat = new SimpleDateFormat("MMM dd, yyyy");
+    final SimpleDateFormat hhmmssFormat = new SimpleDateFormat("hh:mm:ss a");
+    final SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE, MMMM dd, yyyy");
 
     public TableColumnModel getTableColumnModel() {
         TableColumnModel rv = new DefaultTableColumnModel();
-        rv.addColumn(new TableColumn(0, 200));
+        rv.addColumn(new TableColumn(0, 180));
         rv.getColumn(0).setHeaderValue("Date");
-        rv.addColumn(new TableColumn(1, 50));
+        rv.addColumn(new TableColumn(1, 80));
         rv.getColumn(1).setHeaderValue("In");
-        rv.addColumn(new TableColumn(2, 50));
+        rv.addColumn(new TableColumn(2, 80));
         rv.getColumn(2).setHeaderValue("Out");
         DefaultTableCellRenderer rRenderer = new DefaultTableCellRenderer();
         rRenderer.setHorizontalAlignment(JLabel.CENTER);
@@ -80,7 +80,7 @@ public class WorksessionTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        Object o = null;
+        Object o;
         Worksession s = worksessions.get(rowIndex);
         switch (columnIndex) {
             case 0:
