@@ -29,3 +29,7 @@ create cached table if not exists SA.CORRECTIONS (
     CORRECTION_DATE timestamp not null,
     CORRECTED_BY integer not null,
 );
+
+create user if not exists SA password '';
+
+alter user SA admin true;

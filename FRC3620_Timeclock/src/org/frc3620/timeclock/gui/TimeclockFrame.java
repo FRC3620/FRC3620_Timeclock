@@ -1,18 +1,10 @@
 package org.frc3620.timeclock.gui;
 
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -219,7 +211,6 @@ public class TimeclockFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Average Joes 3620 Timeclock");
-        setPreferredSize(new java.awt.Dimension(810, 456));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -300,7 +291,6 @@ public class TimeclockFrame extends javax.swing.JFrame {
         jPanel3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         jPanel3.setMinimumSize(new java.awt.Dimension(0, 24));
         jPanel3.setPreferredSize(new java.awt.Dimension(0, 24));
-        jPanel3.setLayout(new org.jdesktop.swingx.VerticalLayout());
 
         statusLabel.setText(" ");
         jPanel3.add(statusLabel);
