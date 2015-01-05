@@ -11,6 +11,15 @@
  http://jakarta.apache.org/log4j
 -->
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="true">
+    
+    <appender name="LOGFILE" class="org.apache.log4j.FileAppender">
+        <param name="file" value="${user.home}/FRC3620Timeclock/FRC3620Timeclock.log" />
+        <param name="append" value="true" />
+        <param name="threshold" value="debug" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{ISO8601} %-5p [%c{1}] - %m%n" />
+        </layout>
+    </appender>
 
     <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
         <param name="Target" value="System.out" />
@@ -47,6 +56,12 @@
     <logger name="org.springframework.jdbc.core">
         <level value="INFO"/>
     </logger>
+    <logger name="org.frc3620.timeclock.gui.TimeclockFrame">
+        <level value="INFO" />
+    </logger>
+    <logger name="org.frc3620.timeclock.gui.WorksessionEditForm">
+        <level value="INFO" />
+    </logger>
     <logger name="org.frc3620">
         <level value="INFO" />
     </logger>
@@ -55,5 +70,6 @@
     <root>
         <level value="INFO" />
         <appender-ref ref="CONSOLE" />
+        <appender-ref ref="LOGFILE" />
     </root>
 </log4j:configuration>

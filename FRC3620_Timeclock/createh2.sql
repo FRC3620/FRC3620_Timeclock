@@ -1,27 +1,31 @@
-CREATE SCHEMA IF NOT EXISTS SA;
+create schema if not exists SA;
 
-CREATE CACHED TABLE IF NOT EXISTS SA.PERSONS (
-    PERSON_ID INTEGER auto_increment primary key,
-    LASTNAME VARCHAR(255),
-    FIRSTNAME VARCHAR(255),
-    MENTOR SMALLINT default 0,
+create cached table if not exists SA.PERSONS (
+    PERSON_ID integer auto_increment primary key,
+    LASTNAME varchar(255),
+    FIRSTNAME varchar(255),
+    MENTOR boolean not null default 0,
 );
 
-CREATE CACHED TABLE IF NOT EXISTS SA.WORKSESSIONS (
-    WORKSESSION_ID INTEGER auto_increment primary key,
-    PERSON_ID INTEGER NOT NULL,
-    START_DATE DATE NOT NULL,
-    ORIGINAL_START_DATE DATE NOT NULL,
-    END_DATE DATE,
-    ORIGINAL_END_DATE DATE,
+create cached table if not exists SA.WORKSESSIONS (
+    WORKSESSION_ID integer auto_increment primary key,
+    PERSON_ID integer not null,
+    START_DATE timestamp not null,
+    END_DATE timestamp,
+    REMOVED boolean not null default 0,
+    REMOVED_BY integer,
+    ORIGINAL_START_DATE timestamp not null,
+    ORIGINAL_END_DATE timestamp,
 );
 
-CREATE CACHED TABLE IF NOT EXISTS SA.CORRECTIONS (
-    CORRECTION_ID INTEGER auto_increment primary key,
-    WORKSESSION_ID INTEGER NOT NULL,
-    START_OR_END VARCHAR(5) NOT NULL,
-    NEW_DATE DATE NOT NULL,
-    OLD_DATE DATE,
-    CORRECTION_DATE DATE NOT NULL,
-    CORRECTED_BY INTEGER NOT NULL,
+create index if not exists WORKSESSIONS_PERSON_ID_IDX on SA.WORKSESSIONS (PERSON_ID);
+
+create cached table if not exists SA.CORRECTIONS (
+    CORRECTION_ID integer auto_increment primary key,
+    WORKSESSION_ID integer not null,
+    START_OR_END varchar(6) not null,
+    NEW_DATE timestamp,
+    OLD_DATE timestamp,
+    CORRECTION_DATE timestamp not null,
+    CORRECTED_BY integer not null,
 );

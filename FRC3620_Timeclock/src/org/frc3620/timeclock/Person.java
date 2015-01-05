@@ -6,7 +6,7 @@ package org.frc3620.timeclock;
  */
 public class Person {
     private Integer personId;
-    private String lastname, firstname;
+    private String lastName, firstName;
     private Boolean mentor;
 
     public Integer getPersonId() {
@@ -17,20 +17,20 @@ public class Person {
         this.personId = personId;
     }
 
-    public String getLastname() {
-        return lastname;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
-    public String getFirstname() {
-        return firstname;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     public Boolean getMentor() {
@@ -40,9 +40,13 @@ public class Person {
     public void setMentor(Boolean mentor) {
         this.mentor = mentor;
     }
+    
+    public String getName() {
+        return lastName + ", " + firstName;
+    }
 
     @Override
     public String toString() {
-        return "Person{" + "personId=" + personId + ", lastname=" + lastname + ", firstname=" + firstname + ", mentor=" + mentor + '}';
+        return "Person{" + "personId=" + personId + ", lastname=" + lastName + ", firstname=" + firstName + ", mentor=" + mentor + '}';
     }
 }
