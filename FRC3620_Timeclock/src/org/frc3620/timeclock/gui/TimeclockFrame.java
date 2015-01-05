@@ -139,6 +139,10 @@ public class TimeclockFrame extends javax.swing.JFrame {
         substatusLabel.paintImmediately(substatusLabel.getVisibleRect());
  
     }
+    
+    public void setMaintenanceEnabled ( boolean b) {
+        maintenanceMenu.setEnabled(b);
+    }
 
     private boolean windowClosing = false;
 
@@ -175,6 +179,8 @@ public class TimeclockFrame extends javax.swing.JFrame {
         statusLabel = new javax.swing.JLabel();
         substatusLabel = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
+        maintenanceMenu = new javax.swing.JMenu();
+        backupMenuItem = new javax.swing.JMenuItem();
 
         worksessionTablePopupMenu.setLabel("Worksession Context Menu");
 
@@ -273,7 +279,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
                     .addComponent(checkinButton)
                     .addComponent(checkoutButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -287,7 +293,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
@@ -299,6 +305,19 @@ public class TimeclockFrame extends javax.swing.JFrame {
         statusLabel.setText(" ");
         jPanel3.add(statusLabel);
         jPanel3.add(substatusLabel);
+
+        maintenanceMenu.setText("Maintenance");
+        maintenanceMenu.setEnabled(false);
+
+        backupMenuItem.setText("Backup");
+        backupMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backupMenuItemActionPerformed(evt);
+            }
+        });
+        maintenanceMenu.add(backupMenuItem);
+
+        jMenuBar1.add(maintenanceMenu);
 
         setJMenuBar(jMenuBar1);
 
@@ -375,7 +394,12 @@ public class TimeclockFrame extends javax.swing.JFrame {
         formEventListener.addWorksession(personIndex);
     }//GEN-LAST:event_worksessionAddMenuItemActionPerformed
 
+    private void backupMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backupMenuItemActionPerformed
+        formEventListener.backup();
+    }//GEN-LAST:event_backupMenuItemActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem backupMenuItem;
     private javax.swing.JButton checkinButton;
     private javax.swing.JButton checkoutButton;
     private javax.swing.JLabel currentTime;
@@ -386,6 +410,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JMenu maintenanceMenu;
     private javax.swing.JCheckBoxMenuItem mentorModeMenuItem;
     private javax.swing.JLabel personNameLabel;
     private javax.swing.JTable personsTable;

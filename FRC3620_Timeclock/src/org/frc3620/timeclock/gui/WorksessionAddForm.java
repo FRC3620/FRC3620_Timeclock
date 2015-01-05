@@ -16,12 +16,9 @@ public class WorksessionAddForm extends javax.swing.JDialog {
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
-    static final String TIME_FORMAT = "h:mm:ss a";
-    final SimpleDateFormat sdt = new SimpleDateFormat(TIME_FORMAT);
     final SimpleDateFormat dsdt = new SimpleDateFormat("EEEE MMMM dd, yyyy");
 
-
-    SpinnerDateModel startTimeModel;
+    SpinnerDateModel dateModel;
     boolean okHit = false;
 
     /**
@@ -35,10 +32,9 @@ public class WorksessionAddForm extends javax.swing.JDialog {
 
         initComponents();
 
-        startTimeModel = (SpinnerDateModel) startSpinner.getModel();
+        dateModel = (SpinnerDateModel) dateSpinner.getModel();
 
-        fixupDateEditor(startSpinner);
-        resetSpinnerMaxMin();
+        fixupDateEditor(dateSpinner);
     }
 
     private void fixupDateEditor(JSpinner e) {
@@ -49,64 +45,23 @@ public class WorksessionAddForm extends javax.swing.JDialog {
         formatter.setAllowsInvalid(false);
     }
 
-    private void resetSpinnerMaxMin() {
-        Calendar cal1 = GregorianCalendar.getInstance();
-        cal1.clear();
-        cal1.set(1970, Calendar.JANUARY, 1, 0, 0, 0);
-        Date min = cal1.getTime();
-
-        Calendar cal2 = GregorianCalendar.getInstance();
-        cal2.clear();
-        cal2.set(1970, Calendar.JANUARY, 1, 23, 59, 59);
-        cal2.set(Calendar.MILLISECOND, 999);
-        Date max = cal2.getTime();
-
-        startTimeModel.setStart(min);
-        startTimeModel.setEnd(max);
-
-    }
-
-    public void setPersonTitle(String s) {
+    public boolean showDialog(String s) {
+        dateModel.setEnd(Utils.getEndOfDay(new Date()));
         titleLabel.setText(s);
-    }
-
-    public boolean showDialog() {
-        resetEndSpinnerLimit("resetEnd@setup");
 
         okHit = false;
         setVisible(true);
         return okHit;
     }
 
-    void resetEndSpinnerLimit(String s) {
-        logger.debug("touched endTimeModel.setStart");
-        // endTimeModel.setStart((Date) startSpinner.getValue());
-        logSpinners(s);
-    }
-
-    void logSpinners(String s) {
-        logger.info("logging spinners: {}", s);
-        logger.info("start spinner {} {} {} {}", diagDate(startTimeModel.getStart()), diagDate(startTimeModel.getDate()), diagDate(startSpinner.getValue()), diagDate(startTimeModel.getEnd()));
-    }
-
-    public Date getStartTime() {
-        Date rv = startTimeModel.getDate();
+    public Date getDate() {
+        Date rv = dateModel.getDate();
         logger.info("getStartTime = {}", rv);
         return rv;
     }
-
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS z");
-
-    String diagDate(Object o) {
-        if (null == o) {
-            return "(null)";
-        } else {
-            if (o instanceof Date) {
-                return sdf.format(o);
-            } else {
-                return o.toString();
-            }
-        }
+    
+     void logSpinners(String s) {
+        logger.info("date spinner {} {} {} {}", Utils.diagDate(dateModel.getStart()), Utils.diagDate(dateModel.getDate()), Utils.diagDate(dateSpinner.getValue()), Utils.diagDate(dateModel.getEnd()));
     }
 
     /**
@@ -122,7 +77,7 @@ public class WorksessionAddForm extends javax.swing.JDialog {
         titleLabel = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        startSpinner = new javax.swing.JSpinner();
+        dateSpinner = new javax.swing.JSpinner();
         jPanel2 = new javax.swing.JPanel();
         okButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
@@ -145,19 +100,19 @@ public class WorksessionAddForm extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         jPanel1.add(jLabel1, gridBagConstraints);
 
-        startSpinner.setModel(new javax.swing.SpinnerDateModel(new java.util.Date(), null, null, java.util.Calendar.DAY_OF_YEAR));
-        startSpinner.setEditor(new javax.swing.JSpinner.DateEditor(startSpinner, "EEEE MMMM dd, YYYY"));
-        startSpinner.setMinimumSize(new java.awt.Dimension(200, 30));
-        startSpinner.setPreferredSize(new java.awt.Dimension(200, 30));
-        startSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+        dateSpinner.setModel(new javax.swing.SpinnerDateModel(new java.util.Date(), null, null, java.util.Calendar.DAY_OF_YEAR));
+        dateSpinner.setEditor(new javax.swing.JSpinner.DateEditor(dateSpinner, "YYYY-MMMM-dd '('EEEE')'"));
+        dateSpinner.setMinimumSize(new java.awt.Dimension(200, 30));
+        dateSpinner.setPreferredSize(new java.awt.Dimension(200, 30));
+        dateSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                startSpinnerStateChanged(evt);
+                dateSpinnerStateChanged(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
-        jPanel1.add(startSpinner, gridBagConstraints);
+        jPanel1.add(dateSpinner, gridBagConstraints);
 
         okButton.setText("OK");
         okButton.addActionListener(new java.awt.event.ActionListener() {
@@ -205,18 +160,17 @@ public class WorksessionAddForm extends javax.swing.JDialog {
         setVisible(false);
     }//GEN-LAST:event_cancelButtonActionPerformed
 
-    private void startSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_startSpinnerStateChanged
-        logger.info("start spinner change event: {}", startSpinner.getValue());
-        resetEndSpinnerLimit("startChanged");
-    }//GEN-LAST:event_startSpinnerStateChanged
+    private void dateSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_dateSpinnerStateChanged
+        logSpinners("changed");
+    }//GEN-LAST:event_dateSpinnerStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
+    private javax.swing.JSpinner dateSpinner;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JButton okButton;
-    private javax.swing.JSpinner startSpinner;
     private javax.swing.JLabel titleLabel;
     // End of variables declaration//GEN-END:variables
 }

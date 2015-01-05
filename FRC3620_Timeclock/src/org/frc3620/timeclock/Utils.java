@@ -1,5 +1,6 @@
 package org.frc3620.timeclock;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,17 @@ public class Utils {
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DATE);
         calendar.set(year, month, day, 0, 0, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
+    }
+
+    static public Date getMidDay(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DATE);
+        calendar.set(year, month, day, 12, 0, 0);
         calendar.set(Calendar.MILLISECOND, 0);
         return calendar.getTime();
     }
@@ -83,4 +95,22 @@ public class Utils {
         calendar.set(Calendar.MILLISECOND, 0);
         return calendar.getTime();
     }
+    
+        static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS z");
+
+    public static String diagDate(Object o) {
+        if (null == o) {
+            return "(null)";
+        } else {
+            if (o instanceof Date) {
+                synchronized(sdf) {
+                    return sdf.format(o);
+                }
+            } else {
+                return o.toString();
+            }
+        }
+    }
+
+
 }

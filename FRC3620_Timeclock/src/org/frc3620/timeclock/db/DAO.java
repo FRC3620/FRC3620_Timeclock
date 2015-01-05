@@ -1,5 +1,7 @@
 package org.frc3620.timeclock.db;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.sql.DataSource;
@@ -22,10 +24,26 @@ public class DAO {
     BeanPropertyRowMapper<Worksession> worksessionMapper = BeanPropertyRowMapper
             .newInstance(Worksession.class);
 
+    SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMdd-HHmmss");
+
+    public void backup() {
+        Map<String, Object> args = new HashMap<>();
+        File f = new File(new File (System.getProperty("user.home"),"FRC3620Timeclock"), "backup_" + sdf.format(new Date()) + ".zip");
+        String fn = f.getAbsolutePath();
+        args.put("file", fn);
+        logger.info("backing up to {}", fn);
+        jdbcTemplate.update("backup to :file", args);
+        logger.info("backup complete");
+    }
+
     public void createWorksession(Person person) {
+        createWorksession(person, new Date());
+    }
+
+    public void createWorksession(Person person, Date date) {
         Map<String, Object> args = new HashMap<>();
         args.put("person_id", person.getPersonId());
-        args.put("start", new Date());
+        args.put("start", date);
         jdbcTemplate.update("insert into SA.WORKSESSIONS (PERSON_ID, START_DATE, ORIGINAL_START_DATE) VALUES (:person_id, :start, :start)", args);
     }
 

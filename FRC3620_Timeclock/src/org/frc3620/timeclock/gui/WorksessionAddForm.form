@@ -62,13 +62,13 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="javax.swing.JSpinner" name="startSpinner">
+        <Component class="javax.swing.JSpinner" name="dateSpinner">
           <Properties>
             <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
               <SpinnerModel initial="now" stepSize="6" type="date"/>
             </Property>
             <Property name="editor" type="javax.swing.JComponent" editor="org.netbeans.modules.form.editors.SpinnerEditorEditor">
-              <SpinnerEditor format="EEEE MMMM dd, YYYY" type="1"/>
+              <SpinnerEditor format="YYYY-MMMM-dd &apos;(&apos;EEEE&apos;)&apos;" type="1"/>
             </Property>
             <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[200, 30]"/>
@@ -78,7 +78,7 @@
             </Property>
           </Properties>
           <Events>
-            <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="startSpinnerStateChanged"/>
+            <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="dateSpinnerStateChanged"/>
           </Events>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -261,11 +261,11 @@
             <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component, java.lang.Object"/>
           </StatementProvider>
           <Parameters>
-            <CodeExpression id="13_startSpinner">
-              <CodeVariable name="startSpinner" type="8194" declaredType="javax.swing.JSpinner"/>
+            <CodeExpression id="13_dateSpinner">
+              <CodeVariable name="dateSpinner" type="8194" declaredType="javax.swing.JSpinner"/>
               <ExpressionOrigin>
                 <ExpressionProvider type="ComponentRef">
-                  <ComponentRef name="startSpinner"/>
+                  <ComponentRef name="dateSpinner"/>
                 </ExpressionProvider>
               </ExpressionOrigin>
             </CodeExpression>

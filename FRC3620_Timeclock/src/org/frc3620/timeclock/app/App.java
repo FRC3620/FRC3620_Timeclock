@@ -107,6 +107,7 @@ public class App implements FormEventListener {
                 logger.info("new day, reloading!");
                 java.awt.EventQueue.invokeLater(new Runnable() {
                     public void run() {
+                        backup();
                         personsStatusTableModel.reload();
                     }
                 });
@@ -198,8 +199,7 @@ public class App implements FormEventListener {
         Person person = personsStatusTableModel.getPersonAt(personIndex);
         Worksession worksession = worksessionTableModel.getWorksessionAt(workstationIndex);
         logger.info("editing worksession @ {}: {}", workstationIndex, worksession);
-        worksessionEditForm.setPersonTitle(person.getName());
-        boolean okHit = worksessionEditForm.showDialog(worksession.getStartDate(), worksession.getEndDate());
+        boolean okHit = worksessionEditForm.showDialog(person.getName(), worksession.getStartDate(), worksession.getEndDate());
         if (okHit) {
             if (worksessionEditForm.isStartTimeChanged()) {
                 Date newStartTime = worksessionEditForm.getStartTime();
@@ -248,6 +248,7 @@ public class App implements FormEventListener {
     public void clearMentorMode() {
         mentor = null;
         logger.info ("mentor mode cleared");
+        timeclockFrame.setMaintenanceEnabled(false);
     }
 
     @Override
@@ -279,6 +280,7 @@ public class App implements FormEventListener {
             if (rv) {
                 mentor = personsStatusTableModel.getPersonAt(personIndex);
                 logger.info ("mentor mode set: {}", mentor.getName());
+                timeclockFrame.setMaintenanceEnabled(true);
             }
         }
         return rv;
@@ -287,12 +289,21 @@ public class App implements FormEventListener {
     @Override
     public void addWorksession(Integer personIndex) {
         Person person = personsStatusTableModel.getPersonAt(personIndex);
-        worksessionAddForm.setPersonTitle(person.getName());
-        boolean okHit = worksessionAddForm.showDialog();
+        boolean okHit = worksessionAddForm.showDialog(person.getName());
         if (okHit) {
+            Date rv = Utils.getMidDay(worksessionAddForm.getDate());
+            dao.createWorksession(person, rv);
         }
 
         updatePersonStatus(person, personIndex);
+    }
+
+    @Override
+    public void backup() {
+        logger.info("app.backup() called");
+        timeclockFrame.setSubstatus("running backup");
+        dao.backup();        
+        timeclockFrame.setSubstatus(null);
     }
 
 }
