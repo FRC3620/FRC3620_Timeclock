@@ -172,8 +172,15 @@ public class App implements FormEventListener {
     void updatePersonInfoOnScreen(Person person) {
         timeclockFrame.setSubstatus("fetching worksessions for " + person.getName());
         List<Worksession> worksessions = dao.fetchWorksessionsForPerson(person.getPersonId());
+        
+        double h = 0;
+        
+        for (Worksession worksession : worksessions) {
+            if (null != worksession.getHours()) h += worksession.getHours();
+        }
+        
         timeclockFrame.setSubstatus(null);
-        timeclockFrame.setPersonNameText(person.getName());
+        timeclockFrame.setPersonNameText(String.format ("%s (%.1f hrs)", person.getName(), h));
         Worksession lastWorksession = (worksessions.size() > 0) ? worksessions.get(0) : null;
         if (lastWorksession != null && lastWorksession.isToday() && lastWorksession.getEndDate() == null) {
             timeclockFrame.setCheckInButtonEnabled(false);
@@ -290,7 +297,7 @@ public class App implements FormEventListener {
             logger.debug("hit ok");
             String enteredPassword = new String(pPnl.getPassword());
             logger.debug("password = {}", enteredPassword);
-            rv = ("".equals(enteredPassword));
+            rv = ("2011".equals(enteredPassword));
         }
         return rv;
     }

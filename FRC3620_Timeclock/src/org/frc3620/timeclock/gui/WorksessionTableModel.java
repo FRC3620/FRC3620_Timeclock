@@ -34,11 +34,14 @@ public class WorksessionTableModel extends AbstractTableModel {
         rv.getColumn(1).setHeaderValue("In");
         rv.addColumn(new TableColumn(2, 80));
         rv.getColumn(2).setHeaderValue("Out");
+        rv.addColumn(new TableColumn(3, 80));
+        rv.getColumn(3).setHeaderValue("Hours");
         DefaultTableCellRenderer rRenderer = new DefaultTableCellRenderer();
         rRenderer.setHorizontalAlignment(JLabel.CENTER);
         // rv.getColumn(0).setCellRenderer(rRenderer);
         rv.getColumn(1).setCellRenderer(rRenderer);
         rv.getColumn(2).setCellRenderer(rRenderer);
+        rv.getColumn(3).setCellRenderer(rRenderer);
         return rv;
     }
 
@@ -61,7 +64,7 @@ public class WorksessionTableModel extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return 3;
+        return 4;
     }
 
     @Override
@@ -72,6 +75,8 @@ public class WorksessionTableModel extends AbstractTableModel {
             case 1:
                 return String.class;
             case 2:
+                return String.class;
+            case 3:
                 return String.class;
             default:
                 return Object.class;
@@ -113,6 +118,13 @@ public class WorksessionTableModel extends AbstractTableModel {
                     synchronized (hhmmssFormat) {
                         o = hhmmssFormat.format(s.getEndDate());
                     }
+                }
+                break;
+            case 3:
+                if (null == s.getHours()) {
+                    o = "";
+                } else {
+                    o = String.format("%.1f", s.getHours());
                 }
                 break;
             default:

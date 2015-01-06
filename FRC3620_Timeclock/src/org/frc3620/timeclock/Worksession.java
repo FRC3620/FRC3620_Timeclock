@@ -76,6 +76,13 @@ public class Worksession {
         this.removed = removed;
     }
 
+    public Double getHours() {
+        if (null == endDate) return null;
+        Long milliseconds = endDate.getTime() - startDate.getTime();
+        Double h = milliseconds / (1000.0 * 60.0 * 60.0);
+        return h;
+    }
+
     @Override
     public String toString() {
         return "Worksession{" + "worksessionId=" + worksessionId + ", personId=" + personId + ", startDate=" + startDate + ", endDate=" + endDate + '}';
