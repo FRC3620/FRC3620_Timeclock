@@ -112,5 +112,14 @@ public class Utils {
         }
     }
 
+    public static String calledFromWhere() {
+        Throwable t = new Throwable();
+        t.fillInStackTrace();
+        StackTraceElement[] ste = t.getStackTrace();
+        for (StackTraceElement ste1 : ste) {
+            logger.info("called from {}", ste1);
+        }
+        return "";
+    }
 
 }

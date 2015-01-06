@@ -1,17 +1,23 @@
 package org.frc3620.timeclock.db;
 
 import java.io.File;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.sql.DataSource;
 import org.frc3620.timeclock.Person;
+import org.frc3620.timeclock.Utils;
 import org.frc3620.timeclock.Worksession;
 
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -28,11 +34,35 @@ public class DAO {
 
     public void backup() {
         Map<String, Object> args = new HashMap<>();
+        
         File f = new File(new File (System.getProperty("user.home"),"FRC3620Timeclock"), "backup_" + sdf.format(new Date()) + ".zip");
         String fn = f.getAbsolutePath();
         args.put("file", fn);
         logger.info("backing up to {}", fn);
-        jdbcTemplate.update("backup to :file", args);
+        try {
+            jdbcTemplate.update("backup to :file", args);
+        } catch (DataAccessException ex) {
+            logger.error ("backup failed: {}", ex);
+        }
+
+        f = new File(new File (System.getProperty("user.home"),"FRC3620Timeclock"), "backup_" + sdf.format(new Date()) + ".sql");
+        fn = f.getAbsolutePath();
+        String sql = String.format ("script simple to '%s'", fn);
+        logger.info("scripting up to {}", sql);
+        try {
+            // prepared statement does not work here!
+            jdbcTemplate.query(sql, args, new ResultSetExtractor() {
+                @Override
+                public Object extractData(ResultSet rs) throws SQLException, DataAccessException {
+                    logger.info ("got {}");
+                    return rs.toString();
+                }
+            }
+            );
+        } catch (DataAccessException ex) {
+            logger.error ("scripting failed: {}", ex);
+        }
+        
         logger.info("backup complete");
     }
 
@@ -108,6 +138,7 @@ public class DAO {
     }
 
     public Worksession fetchLastWorksessionForPerson(Person person) {
+        // Utils.calledFromWhere();
         Map<String, Object> args = new HashMap<>();
         args.put("person_id", person.getPersonId());
         String where = "person_id = :person_id";
@@ -116,6 +147,7 @@ public class DAO {
     }
 
     public List<Worksession> fetchWorksessionsForPerson(Integer personId) {
+        // Utils.calledFromWhere();
         Map<String, Object> args = new TreeMap<>();
         args.put("person_id", personId);
         String where = "person_id = :person_id";

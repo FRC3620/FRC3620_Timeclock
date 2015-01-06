@@ -68,13 +68,15 @@ public class App implements FormEventListener {
         final TimeclockFrame timeclockFrame2 = timeclockFrame;
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 timeclockFrame2.setVisible(true);
             }
         });
 
         String previousFormattedTime = null;
-        Date previousBeginningOfDay = null;
+        Date previousBeginningOfDay = Utils.getStartOfDay(new Date());
+
         SimpleDateFormat sdt = new SimpleDateFormat("EEEE, MMMM d YYYY, hh:mm:ss a");
         while (true) {
             boolean windowClosed = timeclockFrame.isWindowClosing();
@@ -92,6 +94,7 @@ public class App implements FormEventListener {
             final String formattedTime = sdt.format(new Date());
             if (!formattedTime.equals(previousFormattedTime)) {
                 java.awt.EventQueue.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         timeclockFrame.setTimeText(formattedTime);
                     }
@@ -106,6 +109,7 @@ public class App implements FormEventListener {
                 // all the IN/OUT markers.
                 logger.info("new day, reloading!");
                 java.awt.EventQueue.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         // turn off mentor mode
                         clearMentorMode();
@@ -178,7 +182,7 @@ public class App implements FormEventListener {
             timeclockFrame.setCheckInButtonEnabled(true);
             timeclockFrame.setCheckOutButtonEnabled(false);
         }
-        worksessionTableModel.reload(person);
+        worksessionTableModel.reload(worksessions);
     }
 
     @Override

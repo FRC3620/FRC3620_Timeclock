@@ -42,9 +42,14 @@ public class WorksessionTableModel extends AbstractTableModel {
         return rv;
     }
 
-    public void reload(Person person) {
+    /*public void reload(Person person) {
         logger.info("{} using dao {}", this, dao);
         worksessions = dao.fetchWorksessionsForPerson(person.getPersonId());
+        fireTableDataChanged();
+    }*/
+
+    public void reload(List<Worksession> ws) {
+        worksessions = ws;
         fireTableDataChanged();
     }
 
