@@ -11,7 +11,8 @@ public interface FormEventListener {
    public void addWorksession (Integer personIndex);
    public void editWorksession (Integer personIndex, Integer worksessionIndex);
    public void removeWorksession (Integer personIndex, Integer worksessionIndex);
+   public void setMentorMode(Integer personIndex);
    public void clearMentorMode();
-   public boolean tryToSetMentorMode (Integer personIndex);
+   public boolean checkMentorModePassword();
    public void backup();
 }

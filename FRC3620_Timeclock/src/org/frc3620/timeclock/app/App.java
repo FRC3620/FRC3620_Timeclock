@@ -75,7 +75,7 @@ public class App implements FormEventListener {
 
         String previousFormattedTime = null;
         Date previousBeginningOfDay = null;
-        SimpleDateFormat sdt = new SimpleDateFormat("hh:mm:ss a");
+        SimpleDateFormat sdt = new SimpleDateFormat("EEEE, MMMM d YYYY, hh:mm:ss a");
         while (true) {
             boolean windowClosed = timeclockFrame.isWindowClosing();
             // logger.info ("timeClockFrame closed = {}", windowClosed);
@@ -107,7 +107,12 @@ public class App implements FormEventListener {
                 logger.info("new day, reloading!");
                 java.awt.EventQueue.invokeLater(new Runnable() {
                     public void run() {
+                        // turn off mentor mode
+                        clearMentorMode();
+                        timeclockFrame.setMentorModeMenuSelected(false);
+
                         backup();
+
                         personsStatusTableModel.reload();
                     }
                 });
@@ -245,14 +250,19 @@ public class App implements FormEventListener {
     }
 
     @Override
-    public void clearMentorMode() {
-        mentor = null;
-        logger.info ("mentor mode cleared");
-        timeclockFrame.setMaintenanceEnabled(false);
+    public void setMentorMode(Integer personIndex) {
+        mentor = personsStatusTableModel.getPersonAt(personIndex);
+        logger.info("mentor mode set: {}", mentor.getName());
     }
 
     @Override
-    public boolean tryToSetMentorMode(Integer personIndex) {
+    public void clearMentorMode() {
+        mentor = null;
+        logger.info("mentor mode cleared");
+    }
+
+    @Override
+    public boolean checkMentorModePassword() {
         boolean rv = false;
 
         final PasswordPanel pPnl = new PasswordPanel();
@@ -277,11 +287,6 @@ public class App implements FormEventListener {
             String enteredPassword = new String(pPnl.getPassword());
             logger.debug("password = {}", enteredPassword);
             rv = ("".equals(enteredPassword));
-            if (rv) {
-                mentor = personsStatusTableModel.getPersonAt(personIndex);
-                logger.info ("mentor mode set: {}", mentor.getName());
-                timeclockFrame.setMaintenanceEnabled(true);
-            }
         }
         return rv;
     }
@@ -302,7 +307,7 @@ public class App implements FormEventListener {
     public void backup() {
         logger.info("app.backup() called");
         timeclockFrame.setSubstatus("running backup");
-        dao.backup();        
+        dao.backup();
         timeclockFrame.setSubstatus(null);
     }
 

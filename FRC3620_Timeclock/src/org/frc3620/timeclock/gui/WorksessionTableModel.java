@@ -24,7 +24,7 @@ public class WorksessionTableModel extends AbstractTableModel {
     List<Worksession> worksessions = new ArrayList<>();
 
     final SimpleDateFormat hhmmssFormat = new SimpleDateFormat("hh:mm:ss a");
-    final SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE, MMMM dd, yyyy");
+    final SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE, MMMM d, yyyy");
 
     public TableColumnModel getTableColumnModel() {
         TableColumnModel rv = new DefaultTableColumnModel();

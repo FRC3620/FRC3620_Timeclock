@@ -129,13 +129,8 @@ public class TimeclockFrame extends javax.swing.JFrame {
             substatusLabel.setText (statusSdf.format(new Date()) + " " + s);
         }
         substatusLabel.paintImmediately(substatusLabel.getVisibleRect());
- 
     }
     
-    public void setMaintenanceEnabled ( boolean b) {
-        maintenanceMenu.setEnabled(b);
-    }
-
     private boolean windowClosing = false;
 
     public boolean isWindowClosing() {
@@ -361,18 +356,36 @@ public class TimeclockFrame extends javax.swing.JFrame {
     private void mentorModeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mentorModeMenuItemActionPerformed
         logger.debug("mentorModeMenuItem, selected {}, evt {}", mentorModeMenuItem.isSelected(), evt);
         if (mentorModeMenuItem.isSelected()) {
-            boolean okToSet = formEventListener.tryToSetMentorMode(personsTable.getSelectionModel().getLeadSelectionIndex());
-            if (!okToSet) mentorModeMenuItem.setSelected(false);
+            mentorModeMenuItem.setSelected(false); // turn off checkbox
+            boolean okToSet = formEventListener.checkMentorModePassword();
+            
+            if (okToSet) {
+                mentorModeMenuItem.setSelected(true);
+                formEventListener.setMentorMode(personsTable.getSelectionModel().getLeadSelectionIndex());
+            }
         } else {
             formEventListener.clearMentorMode();
         }
-        if (mentorModeMenuItem.isSelected()) {
-            mentorModeMenuItem.setForeground(Color.red);
-        } else {
-            mentorModeMenuItem.setForeground(Color.black);
-        }
+        updateMenuStatusFromMentorMode();
     }//GEN-LAST:event_mentorModeMenuItemActionPerformed
 
+    public void setMentorModeMenuSelected (boolean b) {
+        mentorModeMenuItem.setSelected(b);
+        updateMenuStatusFromMentorMode();
+    }
+    
+    public void updateMenuStatusFromMentorMode() {
+        boolean b = mentorModeMenuItem.isSelected();
+        logger.info ("updateMenuStatusFromMentorMode: {}", b);
+        if (b) {
+            mentorModeMenuItem.setForeground(Color.red);
+            maintenanceMenu.setEnabled(true);
+        } else {
+            mentorModeMenuItem.setForeground(Color.black);
+            maintenanceMenu.setEnabled(false);
+        }
+    }
+    
     private void worksessionRemoveMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_worksessionRemoveMenuItemActionPerformed
         int personIndex = personsTable.getSelectionModel().getLeadSelectionIndex();
         int workstationIndex = worksessionTable.getSelectionModel().getLeadSelectionIndex();
