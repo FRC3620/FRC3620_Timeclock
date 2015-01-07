@@ -42,7 +42,7 @@ public class AppSettingsAndResources {
     }
 
     final Image getIcon(int size) {
-        String name = String.format("images/FIRSTicon_%d.png", size);
+        String name = String.format("icons/FIRSTicon_%d.png", size);
         try {
             return ImageIO.read(ClassLoader.getSystemResource(name));
         } catch (IOException ex) {

@@ -70,8 +70,11 @@
     nbproject/build-impl.xml file. 
 
     -->
-    <target name="-ivy-retrieve">
-        <ivy:retrieve/> <!-- Load dependencies to the project -->
+    <target name="ivy-retrieve">
+        <ivy:retrieve sync="true"/> 
+        <!--
+        <ivy:report todir="${build.dir}/ivy-report" graph="true"/>
+        -->
         <pathconvert property="ivy.classpath.computed" dirsep="/" pathsep=":">
             <path>
                 <fileset dir="lib" includes="*.jar"/>
@@ -83,9 +86,9 @@
         </propertyfile>
     </target>
 
-    <target name="-pre-compile" depends="-ivy-retrieve"/>
+    <target name="-pre-compile" depends="ivy-retrieve"/>
 
-    <target name="-pre-compile-single" depends="-ivy-retrieve"/>
+    <target name="-pre-compile-single" depends="ivy-retrieve"/>
 
     <target name="-post-clean">
         <delete dir="lib"/>
