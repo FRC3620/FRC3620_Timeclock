@@ -15,7 +15,9 @@ import com.omniscient.log4jcontrib.swingappender.ui.SwingAppenderUI;
  */
 public class SwingAppender extends AppenderSkeleton {
 
-    /** The appender swing UI. */
+    /**
+     * The appender swing UI.
+     */
     private SwingAppenderUI appenderUI = SwingAppenderUI.getInstance();
 
     public SwingAppender() {
@@ -26,32 +28,32 @@ public class SwingAppender extends AppenderSkeleton {
      */
     protected void append(LoggingEvent event) {
         if (!performChecks()) {
-                return;
+            return;
         }
         String logOutput = this.layout.format(event);
         appenderUI.doLog(logOutput);
 
         if (layout.ignoresThrowable()) {
-                String[] lines = event.getThrowableStrRep();
-                        if (lines != null) {
-                                int len = lines.length;
-                                for (int i = 0; i < len; i++) {
-                                        appenderUI.doLog(lines[i]);
-                                        appenderUI.doLog(Layout.LINE_SEP);
-                                }
-                        }
+            String[] lines = event.getThrowableStrRep();
+            if (lines != null) {
+                int len = lines.length;
+                for (int i = 0; i < len; i++) {
+                    appenderUI.doLog(lines[i]);
+                    appenderUI.doLog(Layout.LINE_SEP);
                 }
+            }
+        }
     }
 
     /*
-         * (non-Javadoc)
-         *
-         * @see org.apache.log4j.Appender#close()
-         */
+     * (non-Javadoc)
+     *
+     * @see org.apache.log4j.Appender#close()
+     */
     public void close() {
         //Opportunity for the appender ui to do any cleanup.
         /*appenderUI.close();
-        appenderUI = null;*/
+         appenderUI = null;*/
     }
 
     /* (non-Javadoc)

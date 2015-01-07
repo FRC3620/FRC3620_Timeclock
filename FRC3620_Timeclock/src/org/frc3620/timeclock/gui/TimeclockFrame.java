@@ -1,11 +1,11 @@
 package org.frc3620.timeclock.gui;
 
 import java.awt.Color;
-import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -81,7 +81,8 @@ public class TimeclockFrame extends javax.swing.JFrame {
         });
 
         jMenuBar1.add(mentorModeMenuItem);
-        // setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
+        
+        setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
     }
 
     TableModel personsTableModel = null;

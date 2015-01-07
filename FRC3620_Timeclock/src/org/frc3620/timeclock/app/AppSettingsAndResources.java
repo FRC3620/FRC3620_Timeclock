@@ -19,8 +19,12 @@ public class AppSettingsAndResources {
     static AppSettingsAndResources instance = null;
 
     public static AppSettingsAndResources getInstance() {
-        if (null == instance) {
-            instance = new AppSettingsAndResources();
+        if (instance == null) {
+            synchronized (AppSettingsAndResources.class) {
+                if (instance == null) {
+                    instance = new AppSettingsAndResources();
+                }
+            }
         }
         return instance;
     }
@@ -37,7 +41,7 @@ public class AppSettingsAndResources {
         return new ArrayList<Image>(icons.values());
     }
 
-    Image getIcon(int size) {
+    final Image getIcon(int size) {
         String name = String.format("images/FIRSTicon_%d.png", size);
         try {
             return ImageIO.read(ClassLoader.getSystemResource(name));

@@ -1,5 +1,6 @@
 package org.frc3620.timeclock.app;
 
+import com.omniscient.log4jcontrib.swingappender.ui.SwingAppenderUI;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.SimpleDateFormat;
@@ -126,6 +127,7 @@ public class App implements FormEventListener {
 
         logger.info("timeClockFrame closed");
         timeclockFrame.setVisible(false);
+        SwingAppenderUI.getInstance().close();
         logger.info("app.go() exiting");
 
     }
@@ -321,5 +323,4 @@ public class App implements FormEventListener {
         dao.backup();
         timeclockFrame.setSubstatus(null);
     }
-
 }
