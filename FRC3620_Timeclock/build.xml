@@ -90,5 +90,11 @@
     <target name="-post-clean">
         <delete dir="lib"/>
     </target>
+    
+    <target name="-post-jar">
+        <copy todir="${dist.jar.dir}">
+            <fileset dir="resources" includes="**"/>
+        </copy> 
+    </target> 
 
 </project>

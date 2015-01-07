@@ -98,7 +98,7 @@ public class PersonsStatusTableModel extends AbstractTableModel {
                     setForeground(isSelected ? Color.WHITE : Color.BLACK);
                 }
             } else {
-                    setForeground(isSelected ? Color.WHITE : Color.BLACK);
+                setForeground(isSelected ? Color.WHITE : Color.BLACK);
             }
             return renderer;
         }
@@ -107,9 +107,30 @@ public class PersonsStatusTableModel extends AbstractTableModel {
     public void reload() {
         logger.info("{} using dao {}", this, dao);
         List<Person> persons = dao.fetchPersons();
+
+        Date now = new Date();
+        Date startOfDay = Utils.getStartOfDay(now);
+        Date endOfDay = Utils.getEndOfDay(now);
+
+        List<Worksession> worksessions = dao.fetchWorksessionsForStartDateRange(startOfDay, endOfDay);
+
+        Map<Integer, Worksession> worksessionMap = new TreeMap<>();
+        for (Worksession worksession : worksessions) {
+            // this counts on the worksessions showing up in descending
+            // order of Date, so the last one (the one we want) shows up
+            // first. If we have a worksession in our hand and it's already in
+            // the map, then the one we have in our hand is not the latest.
+            Integer personId = worksession.getPersonId();
+            Worksession mappedWorksession = worksessionMap.get(personId);
+            if (null == mappedWorksession) {
+                worksessionMap.put(personId, worksession);
+            }
+        }
+
         personsStatus.clear();
         for (Person p : persons) {
-            CurrentStatus c = new CurrentStatus(p);
+            Worksession worksession = worksessionMap.get(p.getPersonId());
+            CurrentStatus c = new CurrentStatus(p, worksession);
             personsStatus.add(c);
         }
 
@@ -205,9 +226,23 @@ public class PersonsStatusTableModel extends AbstractTableModel {
         private Date when;
 
         public CurrentStatus(Person person) {
-            this.person = person;
-
+            super();
             Worksession worksession = dao.fetchLastWorksessionForPerson(person);
+            init(person, worksession);
+        }
+
+        public CurrentStatus(Person person, Worksession worksession) {
+            super();
+            init(person, worksession);
+        }
+
+        void init(Person person, Worksession worksession) {
+            this.person = person;
+            
+            if (person.getPersonId() == 11) {
+                logger.debug("breakpoint here");
+            }
+
             Date beginningOfToday = Utils.getStartOfDay(new Date());
             Date beginningOfLastSession = (worksession == null) ? null : worksession.getStartDate();
             logger.info("person: {}, today: {}, last session start: {}", person.getPersonId(), beginningOfToday, beginningOfLastSession);

@@ -1,16 +1,18 @@
 package org.frc3620.timeclock.gui;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
+import org.frc3620.timeclock.app.AppSettingsAndResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +38,8 @@ public class TimeclockFrame extends javax.swing.JFrame {
         personsTableColumnModel = _personsStatusTableModel.getTableColumnModel();
         this.worksessionTableModel = _worksessionTableModel;
         worksessionTableColumnModel = _worksessionTableModel.getTableColumnModel();
+
+        setIconImages(AppSettingsAndResources.getInstance().getIcons());
 
         initComponents();
 
@@ -112,25 +116,27 @@ public class TimeclockFrame extends javax.swing.JFrame {
     public void setMentorModeMenuItemEnabled(boolean b) {
         mentorModeMenuItem.setEnabled(b);
     }
-    
-    final SimpleDateFormat statusSdf = new SimpleDateFormat ("EEEE MMM dd, yyyy hh:mm:ss a");
-    public void setStatus (String s) {
+
+    final SimpleDateFormat statusSdf = new SimpleDateFormat("EEEE MMM dd, yyyy hh:mm:ss a");
+
+    public void setStatus(String s) {
         if ("".equals(s) || null == s) {
             statusLabel.setText("");
         } else {
-            statusLabel.setText (statusSdf.format(new Date()) + " " + s);
+            statusLabel.setText(statusSdf.format(new Date()) + " " + s);
         }
         statusLabel.paintImmediately(statusLabel.getVisibleRect());
     }
-    public void setSubstatus (String s) {
+
+    public void setSubstatus(String s) {
         if ("".equals(s) || null == s) {
             substatusLabel.setText("");
         } else {
-            substatusLabel.setText (statusSdf.format(new Date()) + " " + s);
+            substatusLabel.setText(statusSdf.format(new Date()) + " " + s);
         }
         substatusLabel.paintImmediately(substatusLabel.getVisibleRect());
     }
-    
+
     private boolean windowClosing = false;
 
     public boolean isWindowClosing() {
@@ -358,7 +364,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
         if (mentorModeMenuItem.isSelected()) {
             mentorModeMenuItem.setSelected(false); // turn off checkbox
             boolean okToSet = formEventListener.checkMentorModePassword();
-            
+
             if (okToSet) {
                 mentorModeMenuItem.setSelected(true);
                 formEventListener.setMentorMode(personsTable.getSelectionModel().getLeadSelectionIndex());
@@ -369,14 +375,14 @@ public class TimeclockFrame extends javax.swing.JFrame {
         updateMenuStatusFromMentorMode();
     }//GEN-LAST:event_mentorModeMenuItemActionPerformed
 
-    public void setMentorModeMenuSelected (boolean b) {
+    public void setMentorModeMenuSelected(boolean b) {
         mentorModeMenuItem.setSelected(b);
         updateMenuStatusFromMentorMode();
     }
-    
+
     public void updateMenuStatusFromMentorMode() {
         boolean b = mentorModeMenuItem.isSelected();
-        logger.info ("updateMenuStatusFromMentorMode: {}", b);
+        logger.info("updateMenuStatusFromMentorMode: {}", b);
         if (b) {
             mentorModeMenuItem.setForeground(Color.red);
             maintenanceMenu.setEnabled(true);
@@ -385,7 +391,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
             maintenanceMenu.setEnabled(false);
         }
     }
-    
+
     private void worksessionRemoveMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_worksessionRemoveMenuItemActionPerformed
         int personIndex = personsTable.getSelectionModel().getLeadSelectionIndex();
         int workstationIndex = worksessionTable.getSelectionModel().getLeadSelectionIndex();

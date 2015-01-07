@@ -34,35 +34,35 @@ public class DAO {
 
     public void backup() {
         Map<String, Object> args = new HashMap<>();
-        
-        File f = new File(new File (System.getProperty("user.home"),"FRC3620Timeclock"), "backup_" + sdf.format(new Date()) + ".zip");
+
+        File f = new File(new File(System.getProperty("user.home"), "FRC3620Timeclock"), "backup_" + sdf.format(new Date()) + ".zip");
         String fn = f.getAbsolutePath();
         args.put("file", fn);
         logger.info("backing up to {}", fn);
         try {
             jdbcTemplate.update("backup to :file", args);
         } catch (DataAccessException ex) {
-            logger.error ("backup failed: {}", ex);
+            logger.error("backup failed: {}", ex);
         }
 
-        f = new File(new File (System.getProperty("user.home"),"FRC3620Timeclock"), "backup_" + sdf.format(new Date()) + ".sql");
+        f = new File(new File(System.getProperty("user.home"), "FRC3620Timeclock"), "backup_" + sdf.format(new Date()) + ".sql");
         fn = f.getAbsolutePath();
-        String sql = String.format ("script simple to '%s'", fn);
+        String sql = String.format("script simple to '%s'", fn);
         logger.info("scripting up to {}", sql);
         try {
             // prepared statement does not work here!
             jdbcTemplate.query(sql, args, new ResultSetExtractor() {
                 @Override
                 public Object extractData(ResultSet rs) throws SQLException, DataAccessException {
-                    logger.info ("got {}");
+                    logger.info("got {}");
                     return rs.toString();
                 }
             }
             );
         } catch (DataAccessException ex) {
-            logger.error ("scripting failed: {}", ex);
+            logger.error("scripting failed: {}", ex);
         }
-        
+
         logger.info("backup complete");
     }
 
@@ -112,7 +112,7 @@ public class DAO {
         return fetchPersons("", m);
     }
 
-    public List<Worksession> fetchWorksessions(String where, String post, Map<String, Object> args) {
+    public List<Worksession> fetchWorksessions(String where, String postOrderClause, Map<String, Object> args) {
         StringBuilder sql = new StringBuilder();
         sql.append("select * from SA.WORKSESSIONS where REMOVED = FALSE ");
         if (where != null && where.length() > 0) {
@@ -120,10 +120,10 @@ public class DAO {
             sql.append(where);
             sql.append(" ");
         }
-        sql.append("ORDER BY START_DATE DESC");
-        if (post != null) {
+        sql.append("order by START_DATE desc");
+        if (postOrderClause != null) {
             sql.append(" ");
-            sql.append(post);
+            sql.append(postOrderClause);
         }
         logger.info("query: sql={} {}", sql, args);
 
@@ -135,6 +135,25 @@ public class DAO {
 
     public List<Worksession> fetchWorksessions(String where, Map<String, Object> args) {
         return fetchWorksessions(where, null, args);
+    }
+
+    public List<Worksession> fetchWorksessionsForStartDateRange(Date beginningStartDate, Date endingStartDate) {
+        Map<String, Object> args = new HashMap<>();
+        StringBuilder sb = new StringBuilder();
+        if (null != beginningStartDate) {
+            args.put("d1", beginningStartDate);
+            sb.append("start_date >= :d1");
+        }
+        if (null != endingStartDate) {
+            args.put("d2", endingStartDate);
+            if (sb.length() > 0) {
+                sb.append(" and ");
+            }
+            sb.append("start_date <= :d2");
+        }
+        String where = "(" + sb.toString() + ")";
+        List<Worksession> rv = fetchWorksessions(where, null, args);
+        return rv;
     }
 
     public Worksession fetchLastWorksessionForPerson(Person person) {
