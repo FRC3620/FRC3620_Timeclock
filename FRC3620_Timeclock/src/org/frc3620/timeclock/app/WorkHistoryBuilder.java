@@ -23,7 +23,6 @@ public class WorkHistoryBuilder {
     public List<PersonWithHistory> getHistory() {
         List<Person> persons = dao.fetchPersons();
         List<Worksession> worksessions = dao.fetchWorksessions();
-        System.out.println (Utils.xml(worksessions));
 
         Map<Integer, PersonWithHistory> rvMap = new TreeMap<>();
         Map<Integer, Person> personMap = Person.createPersonMap(persons);

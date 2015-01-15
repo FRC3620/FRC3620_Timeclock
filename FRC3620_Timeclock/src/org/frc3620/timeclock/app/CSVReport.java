@@ -29,7 +29,7 @@ public class CSVReport {
             }
         });
         
-        csv.writeln(new String[] { "name", "start date", "length", "hours", "days", "# no checkouts"} );
+        csv.writeln(new String[] { "name", "start date", "length", "hours", "days", "forgot to checkout"} );
         
         for (PersonWithHistory p : personWithHistoryList) {
             List<HistoryPeriod> hl = new ArrayList<>(p.getHistoryPeriods().values());

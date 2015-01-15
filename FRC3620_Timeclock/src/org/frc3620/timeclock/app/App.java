@@ -6,14 +6,18 @@ import java.awt.event.WindowEvent;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Level;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.frc3620.timeclock.Person;
 import org.frc3620.timeclock.Utils;
 import org.frc3620.timeclock.Worksession;
 import org.frc3620.timeclock.db.DAO;
+import org.frc3620.timeclock.gui.ErrorDialog;
 import org.frc3620.timeclock.gui.FormEventListener;
+import org.frc3620.timeclock.gui.JFileChooserCheckOverWrite;
 import org.frc3620.timeclock.gui.PasswordPanel;
 import org.frc3620.timeclock.gui.PersonsStatusTableModel;
 import org.frc3620.timeclock.gui.TimeclockFrame;
@@ -43,6 +47,8 @@ public class App implements FormEventListener {
     private DAO dao;
     private WorkHistoryBuilder workHistoryBuilder;
 
+    JFileChooser csvFileChooser;
+
     Person mentor = null;
 
     void go() {
@@ -50,6 +56,7 @@ public class App implements FormEventListener {
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
+        /*
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -60,6 +67,7 @@ public class App implements FormEventListener {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             logger.error("Trouble setting look and feel", ex);
         }
+        */
         //</editor-fold>
 
         workHistoryBuilder = new WorkHistoryBuilder(dao);
@@ -69,6 +77,11 @@ public class App implements FormEventListener {
         timeclockFrame = new TimeclockFrame(personsStatusTableModel, worksessionTableModel, this);
         worksessionEditForm = new WorksessionEditForm(timeclockFrame, true);
         worksessionAddForm = new WorksessionAddForm(timeclockFrame, true);
+
+        csvFileChooser = new JFileChooserCheckOverWrite();
+        FileFilter ff = new FileNameExtensionFilter("Comma Separated Values", "csv");
+        csvFileChooser.addChoosableFileFilter(ff);
+        csvFileChooser.setFileFilter(ff);
 
         final TimeclockFrame timeclockFrame2 = timeclockFrame;
         logger.info("running in main thread");
@@ -333,14 +346,18 @@ public class App implements FormEventListener {
 
     @Override
     public void runCsvReport() {
-        try {
-            List<PersonWithHistory> l = workHistoryBuilder.getHistory();
-            System.out.println(Utils.xml(l));
-            StringWriter sw = new StringWriter();
-            CSVReport.generateReport(l, sw);
-            System.out.println(sw.getBuffer().toString());
-        } catch (RuntimeException | IOException ex) {
-            logger.error("boom", ex);
+        int returnVal = csvFileChooser.showSaveDialog(timeclockFrame);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = csvFileChooser.getSelectedFile();
+
+            try {
+                List<PersonWithHistory> l = workHistoryBuilder.getHistory();
+                Writer w = new FileWriter(file);
+                CSVReport.generateReport(l, w);
+            } catch (RuntimeException | IOException ex) {
+                logger.error ("runCSVReport failed", ex);
+                new ErrorDialog(ex).setVisible(true);
+            }
         }
     }
 }
