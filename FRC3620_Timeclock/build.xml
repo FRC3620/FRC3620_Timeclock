@@ -72,9 +72,7 @@
     -->
     <target name="ivy-retrieve">
         <ivy:retrieve sync="true"/> 
-        <!--
         <ivy:report todir="${build.dir}/ivy-report" graph="true"/>
-        -->
         <pathconvert property="ivy.classpath.computed" dirsep="/" pathsep=":">
             <path>
                 <fileset dir="lib" includes="*.jar"/>

@@ -174,15 +174,17 @@ public class App implements FormEventListener {
     void updatePersonInfoOnScreen(Person person) {
         timeclockFrame.setSubstatus("fetching worksessions for " + person.getName());
         List<Worksession> worksessions = dao.fetchWorksessionsForPerson(person.getPersonId());
-        
+
         double h = 0;
-        
+
         for (Worksession worksession : worksessions) {
-            if (null != worksession.getHours()) h += worksession.getHours();
+            if (null != worksession.getHours()) {
+                h += worksession.getHours();
+            }
         }
-        
+
         timeclockFrame.setSubstatus(null);
-        timeclockFrame.setPersonNameText(String.format ("%s (%.1f hrs)", person.getName(), h));
+        timeclockFrame.setPersonNameText(String.format("%s (%.1f hrs)", person.getName(), h));
         Worksession lastWorksession = (worksessions.size() > 0) ? worksessions.get(0) : null;
         if (lastWorksession != null && lastWorksession.isToday() && lastWorksession.getEndDate() == null) {
             timeclockFrame.setCheckInButtonEnabled(false);
@@ -309,11 +311,13 @@ public class App implements FormEventListener {
         Person person = personsStatusTableModel.getPersonAt(personIndex);
         boolean okHit = worksessionAddForm.showDialog(person.getName());
         if (okHit) {
-            Date rv = Utils.getMidDay(worksessionAddForm.getDate());
-            dao.createWorksession(person, rv);
+            Date d = worksessionAddForm.getDate();
+            if (null != d) {
+                d = Utils.getMidDay(d);
+                dao.createWorksession(person, d);
+                updatePersonStatus(person, personIndex);
+            }
         }
-
-        updatePersonStatus(person, personIndex);
     }
 
     @Override

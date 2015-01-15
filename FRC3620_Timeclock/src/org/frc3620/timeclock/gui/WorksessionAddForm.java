@@ -1,9 +1,6 @@
 package org.frc3620.timeclock.gui;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
-import javax.swing.*;
-import javax.swing.text.DefaultFormatter;
 import org.frc3620.timeclock.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +13,6 @@ public class WorksessionAddForm extends javax.swing.JDialog {
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
-    final SimpleDateFormat dsdt = new SimpleDateFormat("EEEE MMMM dd, yyyy");
-
-    SpinnerDateModel dateModel;
     boolean okHit = false;
 
     /**
@@ -31,23 +25,16 @@ public class WorksessionAddForm extends javax.swing.JDialog {
         super(parent, modal);
 
         initComponents();
-
-        dateModel = (SpinnerDateModel) dateSpinner.getModel();
-
-        fixupDateEditor(dateSpinner);
-    }
-
-    private void fixupDateEditor(JSpinner e) {
-        JComponent rv = e.getEditor();
-        JFormattedTextField field = (JFormattedTextField) rv.getComponent(0);
-        DefaultFormatter formatter = (DefaultFormatter) field.getFormatter();
-        formatter.setCommitsOnValidEdit(true);
-        formatter.setAllowsInvalid(false);
     }
 
     public boolean showDialog(String s) {
-        dateModel.setEnd(Utils.getEndOfDay(new Date()));
         titleLabel.setText(s);
+        Date now = new Date();
+             
+        // if you click on a date that is not selectable, you get a null
+        // selection. Wish there were a way to not do that.
+        monthView.setUpperBound(Utils.getEndOfDay(now));
+        monthView.setSelectionDate(now);
 
         okHit = false;
         setVisible(true);
@@ -55,13 +42,24 @@ public class WorksessionAddForm extends javax.swing.JDialog {
     }
 
     public Date getDate() {
-        Date rv = dateModel.getDate();
+        Date rv = monthView.getFirstSelectionDate();
         logger.info("getStartTime = {}", rv);
         return rv;
     }
     
-     void logSpinners(String s) {
-        logger.info("date spinner {} {} {} {}", Utils.diagDate(dateModel.getStart()), Utils.diagDate(dateModel.getDate()), Utils.diagDate(dateSpinner.getValue()), Utils.diagDate(dateModel.getEnd()));
+    public static void main(String[] args) {
+        Throwable boom = null;
+        try {
+            WorksessionAddForm me = new WorksessionAddForm(null, true);
+            boolean rv = me.showDialog("Testing");
+            Date d = me.getDate();
+            me.logger.info ("rv = {}, date = {}", rv, d);
+        } catch (RuntimeException ex) {
+            boom = ex;
+        }
+        if (boom != null) {
+            boom.printStackTrace();
+        }
     }
 
     /**
@@ -76,8 +74,7 @@ public class WorksessionAddForm extends javax.swing.JDialog {
 
         titleLabel = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        dateSpinner = new javax.swing.JSpinner();
+        monthView = new org.jdesktop.swingx.JXMonthView();
         jPanel2 = new javax.swing.JPanel();
         okButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
@@ -88,31 +85,7 @@ public class WorksessionAddForm extends javax.swing.JDialog {
         titleLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         titleLabel.setText("Title");
 
-        java.awt.GridBagLayout jPanel1Layout = new java.awt.GridBagLayout();
-        jPanel1Layout.columnWidths = new int[] {0, 5, 0};
-        jPanel1Layout.rowHeights = new int[] {0};
-        jPanel1.setLayout(jPanel1Layout);
-
-        jLabel1.setText("Date");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        jPanel1.add(jLabel1, gridBagConstraints);
-
-        dateSpinner.setModel(new javax.swing.SpinnerDateModel(new java.util.Date(), null, null, java.util.Calendar.DAY_OF_YEAR));
-        dateSpinner.setEditor(new javax.swing.JSpinner.DateEditor(dateSpinner, "YYYY-MMMM-dd '('EEEE')'"));
-        dateSpinner.setMinimumSize(new java.awt.Dimension(200, 30));
-        dateSpinner.setPreferredSize(new java.awt.Dimension(200, 30));
-        dateSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                dateSpinnerStateChanged(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        jPanel1.add(dateSpinner, gridBagConstraints);
+        jPanel1.add(monthView);
 
         okButton.setText("OK");
         okButton.addActionListener(new java.awt.event.ActionListener() {
@@ -134,7 +107,7 @@ public class WorksessionAddForm extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 294, Short.MAX_VALUE)
             .addComponent(titleLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -160,16 +133,11 @@ public class WorksessionAddForm extends javax.swing.JDialog {
         setVisible(false);
     }//GEN-LAST:event_cancelButtonActionPerformed
 
-    private void dateSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_dateSpinnerStateChanged
-        logSpinners("changed");
-    }//GEN-LAST:event_dateSpinnerStateChanged
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
-    private javax.swing.JSpinner dateSpinner;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private org.jdesktop.swingx.JXMonthView monthView;
     private javax.swing.JButton okButton;
     private javax.swing.JLabel titleLabel;
     // End of variables declaration//GEN-END:variables

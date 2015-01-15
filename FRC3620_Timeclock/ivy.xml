@@ -1,4 +1,10 @@
 <ivy-module version="2.0">
+    <!--
+    need to make sure that you have sync="true" on the ivy:retrieve in
+    the build.xml. If it's not there, then extra jar files seem to show
+    up (the slf4j->log4j jars from slf4j), which produce a conflict 
+    with the slf4j->log4j2 jars from log4j2.
+    -->
     <info organisation="org.frc3620" module="timeclock"/>
 
     <configurations>
@@ -20,6 +26,10 @@
         <dependency org="com.h2database" name="h2" rev="1.4.184"/>
         <dependency org="org.swinglabs.swingx" name="swingx-all" rev="1.6.5-1"/>
         <dependency org="org.ostermiller" name="utils" rev="1.07.00"/>
+        
+        <dependency org="org.apache.pdfbox" name="pdfbox" rev="1.8.8"/>
+        
+        <dependency org="com.itextpdf" name="itextpdf" rev="5.5.4"/>
         
         <exclude org="org.slf4j" module="slf4j-log4j12" />
         <exclude org="org.slf4j" module="slf4j-ext" />

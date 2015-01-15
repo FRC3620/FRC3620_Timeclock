@@ -90,12 +90,12 @@ public class WorksessionEditForm extends javax.swing.JDialog {
 
     public boolean showDialog(String title, Date start, Date end) {
         titleLabel.setText(title);
-        
+
         originalStartTime = Utils.dropFractionalSeconds(start);
         originalEndTime = Utils.dropFractionalSeconds(end);
-       
+
         synchronized (dsdt) {
-            dateLabel.setText (dsdt.format(start));
+            dateLabel.setText(dsdt.format(start));
         }
 
         originalStartTime0 = Utils.getTimeOfDay(originalStartTime);
@@ -125,13 +125,17 @@ public class WorksessionEditForm extends javax.swing.JDialog {
 
     void resetStartSpinnerLimit(String s) {
         logger.debug("touched startTimeModel.setEnd");
-        startTimeModel.setEnd((Date) endSpinner.getValue());
+        if (endDateIsNullCheckbox.isSelected()) {
+            startTimeModel.setEnd(endTimeModel.getEnd());
+        } else {
+            startTimeModel.setEnd(endTimeModel.getDate());
+        }
         logSpinners(s);
     }
 
     void resetEndSpinnerLimit(String s) {
         logger.debug("touched endTimeModel.setStart");
-        endTimeModel.setStart((Date) startSpinner.getValue());
+        endTimeModel.setStart(startTimeModel.getDate());
         logSpinners(s);
     }
 
@@ -165,7 +169,7 @@ public class WorksessionEditForm extends javax.swing.JDialog {
 
     public Date getEndTime() {
         Date rv = null;
-        if (!endDateIsNullCheckbox.isSelected()) {
+        if (endSpinner.isEnabled()) {
             Date d = (null == originalEndTime) ? originalStartTime : originalEndTime;
             rv = Utils.makeCompositeDate(d, endTimeModel.getDate());
         }
@@ -175,6 +179,7 @@ public class WorksessionEditForm extends javax.swing.JDialog {
 
     void updateEndSpinnerEnabled() {
         endSpinner.setEnabled(!endDateIsNullCheckbox.isSelected());
+        resetStartSpinnerLimit("endspinner enabled/disabled");
     }
 
     /**
@@ -370,6 +375,12 @@ public class WorksessionEditForm extends javax.swing.JDialog {
 
     private void endDateIsNullCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_endDateIsNullCheckboxActionPerformed
         updateEndSpinnerEnabled();
+        if (endSpinner.isEnabled()) {
+            if (endTimeModel.getDate().before(startTimeModel.getDate())) {
+                endTimeModel.setValue(startTimeModel.getValue());
+            }
+        }
+
     }//GEN-LAST:event_endDateIsNullCheckboxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
