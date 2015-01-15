@@ -82,6 +82,12 @@ public class Worksession {
         Double h = milliseconds / (1000.0 * 60.0 * 60.0);
         return h;
     }
+    
+    public double getHoursNoNull() {
+        Double rv = getHours();
+        if (null == rv) rv = 0.0;
+        return rv;
+    }
 
     @Override
     public String toString() {

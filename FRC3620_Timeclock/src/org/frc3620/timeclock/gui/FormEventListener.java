@@ -15,4 +15,5 @@ public interface FormEventListener {
    public void clearMentorMode();
    public boolean checkMentorModePassword();
    public void backup();
+   public void runCsvReport();
 }

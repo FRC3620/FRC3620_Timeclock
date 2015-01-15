@@ -1,5 +1,7 @@
 package org.frc3620.timeclock;
 
+import java.util.*;
+
 /**
  *
  * @author wegscd
@@ -48,5 +50,13 @@ public class Person {
     @Override
     public String toString() {
         return "Person{" + "personId=" + personId + ", lastname=" + lastName + ", firstname=" + firstName + ", mentor=" + mentor + '}';
+    }
+ 
+    public static Map<Integer,Person> createPersonMap (Collection<Person> c) {
+        Map<Integer,Person> rv = new TreeMap<>();
+        for (Person p : c) {
+            rv.put (p.getPersonId(), p);
+        }
+        return rv;
     }
 }

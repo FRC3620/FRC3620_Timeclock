@@ -111,6 +111,11 @@ public class DAO {
         Map<String, Object> m = Collections.emptyMap();
         return fetchPersons("", m);
     }
+    
+    public List<Worksession> fetchWorksessions() {
+        Map<String, Object> m = Collections.emptyMap();
+        return fetchWorksessions(null, m);
+    }
 
     public List<Worksession> fetchWorksessions(String where, String postOrderClause, Map<String, Object> args) {
         StringBuilder sql = new StringBuilder();

@@ -173,6 +173,8 @@ public class TimeclockFrame extends javax.swing.JFrame {
         statusLabel = new javax.swing.JLabel();
         substatusLabel = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
+        reportMenu = new javax.swing.JMenu();
+        createCsvMenuItem = new javax.swing.JMenuItem();
         maintenanceMenu = new javax.swing.JMenu();
         backupMenuItem = new javax.swing.JMenuItem();
 
@@ -298,6 +300,18 @@ public class TimeclockFrame extends javax.swing.JFrame {
         jPanel3.add(statusLabel);
         jPanel3.add(substatusLabel);
 
+        reportMenu.setText("Reports");
+
+        createCsvMenuItem.setText("Create CSV file");
+        createCsvMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                createCsvMenuItemActionPerformed(evt);
+            }
+        });
+        reportMenu.add(createCsvMenuItem);
+
+        jMenuBar1.add(reportMenu);
+
         maintenanceMenu.setText("Maintenance");
         maintenanceMenu.setEnabled(false);
 
@@ -408,10 +422,15 @@ public class TimeclockFrame extends javax.swing.JFrame {
         formEventListener.backup();
     }//GEN-LAST:event_backupMenuItemActionPerformed
 
+    private void createCsvMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createCsvMenuItemActionPerformed
+        formEventListener.runCsvReport();
+    }//GEN-LAST:event_createCsvMenuItemActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem backupMenuItem;
     private javax.swing.JButton checkinButton;
     private javax.swing.JButton checkoutButton;
+    private javax.swing.JMenuItem createCsvMenuItem;
     private javax.swing.JLabel currentTime;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
@@ -424,6 +443,7 @@ public class TimeclockFrame extends javax.swing.JFrame {
     private javax.swing.JCheckBoxMenuItem mentorModeMenuItem;
     private javax.swing.JLabel personNameLabel;
     private javax.swing.JTable personsTable;
+    private javax.swing.JMenu reportMenu;
     private javax.swing.JLabel statusLabel;
     private javax.swing.JLabel substatusLabel;
     private javax.swing.JMenuItem worksessionAddMenuItem;

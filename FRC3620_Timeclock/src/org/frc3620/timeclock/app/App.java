@@ -1,10 +1,12 @@
 package org.frc3620.timeclock.app;
 
+import org.frc3620.timeclock.workhistory.PersonWithHistory;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.logging.Level;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import org.frc3620.timeclock.Person;
@@ -39,6 +41,7 @@ public class App implements FormEventListener {
     private WorksessionTableModel worksessionTableModel;
 
     private DAO dao;
+    private WorkHistoryBuilder workHistoryBuilder;
 
     Person mentor = null;
 
@@ -58,6 +61,8 @@ public class App implements FormEventListener {
             logger.error("Trouble setting look and feel", ex);
         }
         //</editor-fold>
+
+        workHistoryBuilder = new WorkHistoryBuilder(dao);
 
         personsStatusTableModel.reload();
 
@@ -178,9 +183,7 @@ public class App implements FormEventListener {
         double h = 0;
 
         for (Worksession worksession : worksessions) {
-            if (null != worksession.getHours()) {
-                h += worksession.getHours();
-            }
+            h += worksession.getHoursNoNull();
         }
 
         timeclockFrame.setSubstatus(null);
@@ -326,5 +329,18 @@ public class App implements FormEventListener {
         timeclockFrame.setSubstatus("running backup");
         dao.backup();
         timeclockFrame.setSubstatus(null);
+    }
+
+    @Override
+    public void runCsvReport() {
+        try {
+            List<PersonWithHistory> l = workHistoryBuilder.getHistory();
+            System.out.println(Utils.xml(l));
+            StringWriter sw = new StringWriter();
+            CSVReport.generateReport(l, sw);
+            System.out.println(sw.getBuffer().toString());
+        } catch (RuntimeException | IOException ex) {
+            logger.error("boom", ex);
+        }
     }
 }

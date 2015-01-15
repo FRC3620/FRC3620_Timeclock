@@ -27,6 +27,9 @@
         <dependency org="org.swinglabs.swingx" name="swingx-all" rev="1.6.5-1"/>
         <dependency org="org.ostermiller" name="utils" rev="1.07.00"/>
         
+        <dependency org="com.thoughtworks.xstream" name="xstream" rev="1.4.7"/>
+
+        
         <dependency org="org.apache.pdfbox" name="pdfbox" rev="1.8.8"/>
         
         <dependency org="com.itextpdf" name="itextpdf" rev="5.5.4"/>
@@ -34,5 +37,6 @@
         <exclude org="org.slf4j" module="slf4j-log4j12" />
         <exclude org="org.slf4j" module="slf4j-ext" />
     </dependencies>
+    
 
 </ivy-module>
