@@ -94,7 +94,10 @@
     
     <target name="-post-jar">
         <copy todir="${dist.jar.dir}/icons">
-            <fileset dir="resources/icons" includes="**"/>
+            <fileset dir="resources/icons" includes="**/*.png"/>
+        </copy> 
+        <copy todir="${dist.jar.dir}/">
+            <fileset dir="resources/icons" includes="**/*.ico"/>
         </copy> 
     </target> 
 
