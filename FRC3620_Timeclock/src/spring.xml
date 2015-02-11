@@ -27,7 +27,7 @@
  <!-- <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" > -->
  <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
   <property name="driverClassName" value="org.h2.Driver" />
-  <property name="url" value="jdbc:h2:file:#{ systemProperties['user.home'] }/FRC3620Timeclock/FRC3620Timeclock;AUTO_SERVER=TRUE" /> <!-- ;TRACE_LEVEL_SYSTEM_OUT=3 -->
+  <property name="url" value="jdbc:h2:file:#{ systemProperties['user.home'] }/FRC3620Timeclock/FRC3620Timeclock;AUTO_SERVER=TRUE;JMX=TRUE" /> <!-- ;TRACE_LEVEL_SYSTEM_OUT=3 -->
   <property name="username" value="SA" />
   <property name="password" value="" />
  </bean>
