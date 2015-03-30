@@ -5,6 +5,7 @@
 
 # Package Files #
 *.jar
+!/FRC3620_Timeclock/tools/*.jar
 *.war
 *.ear
 
