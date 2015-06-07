@@ -14,7 +14,7 @@ import org.frc3620.timeclock.workhistory.PersonWithHistory;
  */
 public class CSVReport {
     
-    static SimpleDateFormat sdf = new SimpleDateFormat("MMMM DD, YYYY");
+    static SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, YYYY");
 
     public static void generateReport(List<PersonWithHistory> personWithHistoryList, Writer w) throws IOException {
         CSVPrint csv = new ExcelCSVPrinter(w);
