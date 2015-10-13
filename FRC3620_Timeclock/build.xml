@@ -98,7 +98,9 @@
         </copy> 
         <copy todir="${dist.jar.dir}/">
             <fileset dir="resources/icons" includes="**/*.ico"/>
+            <fileset dir="resources" includes="*.sh"/>
         </copy> 
+        <chmod file="${dist.jar.dir}/*.sh" perm="ugo+rx"/>
     </target> 
 
 </project>
