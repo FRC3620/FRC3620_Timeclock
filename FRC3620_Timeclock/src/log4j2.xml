@@ -19,7 +19,7 @@
     <Loggers>
         <Logger name="org.springframework" level="info" />
         <Logger name="org.springframework.jdbc.core" level="info" />
-        <Logger name="org.frc3620.timeclock.gui.TimeclockFrame" level="debug" />
+        <Logger name="org.frc3620.timeclock.gui.TimeclockFrame" level="info" />
         <Logger name="org.frc3620.timeclock.gui.WorksessionEditForm" level="info" />
         <Logger name="org.frc3620" level="info" />
 
