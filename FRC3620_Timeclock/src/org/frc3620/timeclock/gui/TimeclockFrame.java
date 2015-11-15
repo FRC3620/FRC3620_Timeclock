@@ -60,19 +60,40 @@ public class TimeclockFrame extends javax.swing.JFrame {
         worksessionTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-                logger.debug ("mouseReleasedEvent {}", e);
+                logger.debug("mouseReleasedEvent {}", e);
                 worksessionPopup(e);
             }
-            
+
             @Override
             public void mousePressed(MouseEvent e) {
-                logger.debug ("mousePressedEvent {}", e);
+                logger.debug("mousePressedEvent {}", e);
                 worksessionPopup(e);
             }
+
+            void worksessionPopup(MouseEvent e) {
+                if (!isMentorMode()) {
+                    return;
+                }
+                int r = worksessionTable.rowAtPoint(e.getPoint());
+                if (r >= 0 && r < worksessionTable.getRowCount()) {
+                    worksessionTable.setRowSelectionInterval(r, r);
+                } else {
+                    worksessionTable.clearSelection();
+                }
+
+                int rowindex = worksessionTable.getSelectedRow();
+                if (rowindex < 0) {
+                    return;
+                }
+                if (e.isPopupTrigger() && e.getComponent() instanceof JTable) {
+                    worksessionTablePopupMenu.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+
         });
 
         jMenuBar1.add(mentorModeMenuItem);
-        
+
         setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
     }
 
@@ -134,27 +155,6 @@ public class TimeclockFrame extends javax.swing.JFrame {
     public boolean isWindowClosing() {
         return windowClosing;
     }
-    
-    void worksessionPopup(MouseEvent e) {
-        if (!isMentorMode()) {
-            return;
-        }
-        int r = worksessionTable.rowAtPoint(e.getPoint());
-        if (r >= 0 && r < worksessionTable.getRowCount()) {
-            worksessionTable.setRowSelectionInterval(r, r);
-        } else {
-            worksessionTable.clearSelection();
-        }
-
-        int rowindex = worksessionTable.getSelectedRow();
-        if (rowindex < 0) {
-            return;
-        }
-        if (e.isPopupTrigger() && e.getComponent() instanceof JTable) {
-            worksessionTablePopupMenu.show(e.getComponent(), e.getX(), e.getY());
-        }
-    }
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
