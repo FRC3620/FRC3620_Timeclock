@@ -60,6 +60,17 @@ public class TimeclockFrame extends javax.swing.JFrame {
         worksessionTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
+                logger.debug("mouseReleasedEvent {}", e);
+                worksessionPopup(e);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                logger.debug("mousePressedEvent {}", e);
+                worksessionPopup(e);
+            }
+
+            void worksessionPopup(MouseEvent e) {
                 if (!isMentorMode()) {
                     return;
                 }
@@ -78,10 +89,11 @@ public class TimeclockFrame extends javax.swing.JFrame {
                     worksessionTablePopupMenu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
+
         });
 
         jMenuBar1.add(mentorModeMenuItem);
-        
+
         setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
     }
 
