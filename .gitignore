@@ -14,3 +14,5 @@ hs_err_pid*
 /FRC3620_Timeclock/nbproject/private/
 /FRC3620_Timeclock/build/
 /FRC3620_Timeclock/dist/
+out
+/.idea/workspace.xml

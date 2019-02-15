@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="org.ostermiller:utils:1.07.00" type="repository">
+    <properties maven-id="org.ostermiller:utils:1.07.00" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/ostermiller/utils/1.07.00/utils-1.07.00.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
